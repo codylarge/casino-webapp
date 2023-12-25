@@ -7,7 +7,9 @@ import Layout from "../layouts/Layout.astro";
 <main>
   <script src="src/scripts/wheel.js" defer></script>
   <h1>THE WHEEL</h1>
+
   <div class="wheel-container">
+    <div class="arrow" id="arrow"></div>
     <div id="wheel">
       <div class="center-circle" id="spin-button"></div>
     </div>
@@ -15,6 +17,24 @@ import Layout from "../layouts/Layout.astro";
 </main>
 
 <style>
+  h1 {
+    color: white;
+    font-size: 5em;
+    text-align: center;
+  }
+
+  .arrow {
+    z-index: 1;
+    position: absolute;
+    left: 47.5%;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 50px solid white; /* Default color, adjust as needed */
+    transform-origin: bottom center;
+  }
+
   .wheel-container {
     position: relative;
     width: 50%;
