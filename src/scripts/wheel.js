@@ -1,3 +1,4 @@
+// Beautifully hardcoded color segments
 const colorSegments = [
   { color: "red", range: [0, 15] },
   { color: "yellow", range: [15, 30] },
@@ -26,15 +27,22 @@ const colorSegments = [
 ];
 
 document.addEventListener("DOMContentLoaded", function () {
-  const wheel = document.getElementById("wheel");
   const spinButton = document.getElementById("spin-button");
 
   spinButton.addEventListener("click", function () {
-    const randomSeed = Math.floor(Math.random() * 360);
-    const spins = Math.floor(Math.random() * 2) + 1; // Adjust the number of spins
-    const randomDegree = spins * 360 + randomSeed;
+    // Disable spin button during animation
+    spinButton.classList.add("unclickable");
 
-    console.log("RandomDegree: " + randomDegree);
+    // Wheel Spins in the negative direction so degree is always negative
+    const min = 2320;
+    let randomDegree;
+    do {
+      randomDegree = -Math.floor(Math.random() * min * 1.5);
+      console.log(randomDegree);
+    } while (Math.abs(randomDegree) < min);
+
+    console.log("random degree: " + randomDegree);
+
     // Apply the rotation animation to the wheel
     spinTo(randomDegree);
   });
@@ -42,19 +50,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const spinTo = (angle) => {
   const wheel = document.getElementById("wheel");
-  wheel.style.transition = "transform 3s ease-out"; // Adjust the transition duration
-  wheel.style.transform = `rotate(${angle}deg) rotateX(0) rotateY(0)`;
+  wheel.style.transition = "transform 6s cubic-bezier(.5, 1, 0.25, 1)"; // Use a default cubic bezier easing
+  wheel.style.transform = `rotate(${angle}deg)`;
 
-  // Determine the color based on the final angle
+  // Calculate the final angle after the animation
   const finalAngle = angle % 360;
-  console.log("Final Angle: " + finalAngle);
-  //const color = getColorByAngle(finalAngle);
 
-  // Log or handle the color as needed
-  //console.log("Landed on color:", color);
+  setTimeout(() => {
+    const spinButton = document.getElementById("spin-button");
+    // Determine the color based on the final angle
+    const color = getColorByAngle(Math.abs(finalAngle));
+    // Output the result
+    console.log("Landed on color:", color);
+    spinButton.classList.remove("unclickable");
+    setTimeout(resetWheel, 3000);
+  }, 6000); // Adjust to match transition duration
+};
+
+const getColorByAngle = (angle) => {
+  console.log("angle:" + angle);
+  // Find the color segment corresponding to the angle
+  for (const segment of colorSegments) {
+    if (angle >= segment.range[0] && angle <= segment.range[1]) {
+      return segment.color;
+    }
+  }
 };
 
 const resetWheel = () => {
-  // Reset the wheel to its initial position
-  spinTo(0);
+  const wheel = document.getElementById("wheel");
+  wheel.style.transition = "none"; // Disables transition for instant reset
+  wheel.style.transform = "rotate(0deg)";
 };
