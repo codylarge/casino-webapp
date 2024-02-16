@@ -2,6 +2,7 @@
 
 ---
 
+<p id="lastColor"></p>
 <div class="wheel-container">
   <div class="arrow" id="arrow"></div>
   <div id="wheel">
@@ -14,6 +15,12 @@
   h1 {
     color: white;
     font-size: 5em;
+    text-align: center;
+  }
+
+  #lastColor {
+    color: white;
+    font-size: 3em;
     text-align: center;
   }
 
@@ -31,7 +38,7 @@
 
   .wheel-container {
     position: relative;
-    width: 40%;
+    width: 50%;
     justify-content: center;
     align-items: center;
     margin: auto;
@@ -91,8 +98,7 @@
       green 345deg,
       green 360deg
     );
-
-    box-shadow: inset 0 0 15px 5px #333;
+    box-shadow: inset 0 0 25px 10px #333;
     border-radius: 50%;
     position: absolute;
     transform: rotate(0deg);
@@ -115,5 +121,12 @@
 
   .unclickable {
     pointer-events: none;
+  }
+
+  @media (max-width: 1500px) {
+    /* Add your CSS rules here */
+    .wheel-container {
+      width: 80%;
+    }
   }
 </style>
