@@ -2,6 +2,15 @@
 
 ---
 
+<p id="money">$<span id="amount">1000</span></p>
+<p>Place Bets:</p>
+<div class="input-container">
+  <input id="yellow-bet" type="number" min="1" placeholder="×2" />
+  <input id="green-bet" type="number" min="1" placeholder="×4" />
+  <input id="blue-bet" type="number" min="1" placeholder="×6" />
+  <input id="pink-bet" type="number" min="1" placeholder="×12" />
+  <input id="red-bet" type="number" min="1" placeholder="×25" />
+</div>
 <p id="lastColor"></p>
 <div class="wheel-container">
   <div class="arrow" id="arrow"></div>
@@ -18,10 +27,46 @@
     text-align: center;
   }
 
+  p {
+    color: silver;
+    font-size: 2em;
+    text-align: center;
+  }
+
+  .input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    color: white;
+  }
+  .input-container input {
+    margin-right: 10px;
+    /* Example styles for input text */
+    font-size: 16px;
+    color: black;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+  }
+
+  input {
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    text-align: center;
+  }
+
   #lastColor {
     color: white;
-    font-size: 3em;
+    font-size: 2em;
     text-align: center;
+  }
+
+  #money {
+    color: white;
+    margin: 0px;
+    font-size: 4em;
+    color: limegreen;
   }
 
   .arrow {
@@ -43,6 +88,26 @@
     align-items: center;
     margin: auto;
     /*overflow: hidden; /* Prevent content from extending beyond container */
+  }
+
+  #red-bet {
+    background-color: red;
+  }
+
+  #yellow-bet {
+    background-color: yellow;
+  }
+
+  #green-bet {
+    background-color: green;
+  }
+
+  #blue-bet {
+    background-color: blue;
+  }
+
+  #pink-bet {
+    background-color: hotpink;
   }
 
   #wheel {

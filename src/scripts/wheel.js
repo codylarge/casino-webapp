@@ -1,4 +1,5 @@
 // Beautifully hardcoded color segments
+var spinTime = 6; // Time in seconds
 const colorSegments = [
   { color: "red", range: [0, 15], mult: 20 },
   { color: "yellow", range: [15, 30], mult: 1 },
@@ -49,25 +50,67 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const spinTo = (angle) => {
+  const money = document.getElementById("amount");
   const wheel = document.getElementById("wheel");
-  wheel.style.transition = "transform 6s cubic-bezier(.5, 1, 0.25, 1)"; // Use a default cubic bezier easing
+  wheel.style.transition =
+    "transform " + spinTime + "s cubic-bezier(.5, 1, 0.25, 1)"; // Use a default cubic bezier easing
   wheel.style.transform = `rotate(${angle}deg)`;
 
   // Calculate the final angle after the animation
   const finalAngle = angle % 360;
-
   // Spin timeout, ensures spin is complete and results are outputted before resetting
   setTimeout(() => {
     const lastColor = document.getElementById("lastColor");
 
-    // Determine the color based on the final angle
     const color = getColorByAngle(Math.abs(finalAngle));
-
     lastColor.innerHTML = "Last spin: " + color;
 
-    setTimeout(resetWheel, 3000);
-  }, 6000); // Adjust to match transition duration
+    let winnings = countWinnings();
+    money.innerHTML = parseInt(money.innerHTML) + winnings;
+
+    setTimeout(resetWheel, 1000);
+  }, spinTime * 1000); // Adjust to match transition duration
 };
+
+function countWinnings() {
+  const lastColor = document.getElementById("lastColor");
+  const lastColorValue = lastColor.innerHTML.split(" ")[2]; // Get the color from the lastColor element
+  var inputs = document.querySelectorAll('input[type="number"]');
+  var values = [];
+
+  for (var i = 0; i < inputs.length; i++) {
+    var value = parseInt(inputs[i].value);
+    values.push(isNaN(value) ? 0 : value); // Enter 0 for no bet
+  }
+
+  //console.log("yellow: " + values[0], "green: " + values[1], "blue: " + values[2], "hotpink: " + values[3], "red: " + values[4]);
+
+  let winnings = 0;
+  switch (lastColorValue) {
+    case "yellow":
+      winnings = values[0] * 2;
+      break;
+
+    case "green":
+      winnings = values[1] * 4;
+      break;
+
+    case "blue":
+      winnings = values[2] * 6;
+      break;
+
+    case "hotpink":
+      winnings = values[3] * 12;
+      break;
+
+    case "red":
+      winnings = values[4] * 25;
+      break;
+  }
+
+  console.log("Winnings: " + winnings);
+  return winnings;
+}
 
 const getColorByAngle = (angle) => {
   console.log("angle:" + angle);
