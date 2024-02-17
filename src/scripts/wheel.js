@@ -1,5 +1,5 @@
 // Beautifully hardcoded color segments
-var spinTime = 6; // Time in seconds
+var SPIN_TIME = 6; // Time in seconds
 const colorSegments = [
   { color: "red", range: [0, 15], mult: 20 },
   { color: "yellow", range: [15, 30], mult: 1 },
@@ -51,14 +51,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const spinTo = (angle) => {
   const money = document.getElementById("amount");
+  const moneyAmount = parseInt(money.innerHTML)
   const wheel = document.getElementById("wheel");
-  wheel.style.transition =
-    "transform " + spinTime + "s cubic-bezier(.5, 1, 0.25, 1)"; // Use a default cubic bezier easing
+
+  // Spin Wheel
+  wheel.style.transition = "transform " + SPIN_TIME + "s cubic-bezier(.5, 1, 0.25, 1)"; // Use a default cubic bezier easing
   wheel.style.transform = `rotate(${angle}deg)`;
 
-  // Calculate the final angle after the animation
   const finalAngle = angle % 360;
-  // Spin timeout, ensures spin is complete and results are outputted before resetting
+
+  // Makes sure spin is complete before outputting results
   setTimeout(() => {
     const lastColor = document.getElementById("lastColor");
 
@@ -66,10 +68,10 @@ const spinTo = (angle) => {
     lastColor.innerHTML = "Last spin: " + color;
 
     let winnings = countWinnings();
-    money.innerHTML = parseInt(money.innerHTML) + winnings;
+    money.innerHTML = moneyAmount + winnings;
 
-    setTimeout(resetWheel, 1000);
-  }, spinTime * 1000); // Adjust to match transition duration
+    setTimeout(resetWheel, 1000); // Ensures spin is complete and results are outputted before resetting
+  }, SPIN_TIME * 1000);
 };
 
 function countWinnings() {
@@ -84,33 +86,53 @@ function countWinnings() {
   }
 
   //console.log("yellow: " + values[0], "green: " + values[1], "blue: " + values[2], "hotpink: " + values[3], "red: " + values[4]);
-
   let winnings = 0;
   switch (lastColorValue) {
     case "yellow":
-      winnings = values[0] * 2;
+      winnings += values[0] * 2;
+      winnings -= values[1];
+      winnings -= values[2];
+      winnings -= values[3];
+      winnings -= values[4];
       break;
 
     case "green":
-      winnings = values[1] * 4;
+      winnings -= values[0];
+      winnings += values[1] * 4;
+      winnings -= values[2];
+      winnings -= values[3];
+      winnings -= values[4];
       break;
 
     case "blue":
-      winnings = values[2] * 6;
+      winnings -= values[0];
+      winnings -= values[1];
+      winnings += values[2] * 6;
+      winnings -= values[3];
+      winnings -= values[4];
       break;
 
     case "hotpink":
-      winnings = values[3] * 12;
+      winnings -= values[0];
+      winnings -= values[1];
+      winnings -= values[2];
+      winnings += values[3] * 12;
+      winnings -= values[4];
       break;
 
     case "red":
-      winnings = values[4] * 25;
+      winnings -= values[0];
+      winnings -= values[1];
+      winnings -= values[2];
+      winnings -= values[3];
+      winnings += values[4] * 25;
       break;
   }
 
   console.log("Winnings: " + winnings);
   return winnings;
 }
+
 
 const getColorByAngle = (angle) => {
   console.log("angle:" + angle);
