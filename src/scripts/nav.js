@@ -1,9 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  if (!sessionStorage.getItem("money")) {
-    console.log("Storage not found setting now");
-    sessionStorage.setItem("money", "1000");
-  }
-
   const hamburger = document.querySelector(".hamburger");
   const navLinks = document.querySelector(".main-nav-links");
 

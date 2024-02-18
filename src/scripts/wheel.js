@@ -34,8 +34,7 @@ const colorOptions = ["yellow", "green", "blue", "hotpink", "red"];
 // Site-Wide money variable (Session storage)
 const storage = sessionStorage.getItem("money");
 let money = parseInt(storage);
-document.querySelector("#money").textContent = `$${money}`;
-
+console.log("money: " + money);
 // Users inputs (Referenced in almost every method so I just made it global)
 const inputs = document.querySelectorAll('input[type="number"]');
 
@@ -57,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("random degree: " + randomDegree);
 
     if (money < 1 || getTotalBet() > money) {
-      alert("You do not have enough money to bet");
+      alert("You do not have enough money to bet: " + getTotalBet());
       spinButton.classList.remove("unclickable");
       return;
     }
@@ -102,6 +101,7 @@ const spinTo = (angle) => {
     console.log("money" + money);
 
     sessionStorage.setItem("money", money.toString());
+    console.log("session storage money: " + sessionStorage.getItem("money"));
     document.querySelector("#money").textContent = `$${money}`; // Changes #money from Nav component
     toggleInputs();
     setTimeout(resetWheel, 1000); // Ensures spin is complete and results are outputted before resetting
@@ -169,7 +169,7 @@ const getTotalBet = () => {
   let totalBet = 0;
   for (let i = 0; i < colorOptions.length; i++) {
     let color = colorOptions[i];
-    let bet = document.getElementById(`${color}-bet`).value;
+    let bet = parseInt(document.getElementById(`${color}-bet`).value);
     totalBet += bet;
   }
   return totalBet;
@@ -205,9 +205,6 @@ const clearInputGlow = () => {
 
 const toggleInputs = () => {
   for (const input of inputs) {
-    if (input.disabled) {
-      input.value = "";
-    }
     input.disabled = !input.disabled;
   }
 };
