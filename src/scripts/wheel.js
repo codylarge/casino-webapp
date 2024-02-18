@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("random degree: " + randomDegree);
 
+    console.log("total bet: " + getTotalBet());
     if (money < 1 || getTotalBet() > money) {
       alert("You do not have enough money to bet: " + getTotalBet());
       spinButton.classList.remove("unclickable");
@@ -172,6 +173,7 @@ const getTotalBet = () => {
   for (let i = 0; i < colorOptions.length; i++) {
     let color = colorOptions[i];
     let bet = parseInt(document.getElementById(`${color}-bet`).value);
+    if (isNaN(bet)) bet = 0;
     totalBet += bet;
   }
   return totalBet;
