@@ -1,0 +1,105 @@
+---
+
+---
+
+<nav class="main-nav">
+  <div id="money"></div>
+  <ul class="main-nav-links">
+    <li><a href="/" class="main-nav-link">Home</a></li>
+    <li><a href="/wheel" class="main-nav-link">Wheel</a></li>
+    <li><a href="/blackjack" class="main-nav-link">Blackjack</a></li>
+    <li><a href="/horses" class="main-nav-link">Races</a></li>
+  </ul>
+  <div class="hamburger">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+</nav>
+<script src="../scripts/nav.js"></script>
+<script src="../scripts/sessionStorage.js"></script>
+
+<style>
+  ul {
+    align-items: center;
+  }
+
+  #money {
+    padding-inline: 10px;
+    color: white;
+    font-size: 4em;
+    color: limegreen;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px #000;
+  }
+
+  .main-nav {
+    font-family: "Kode Mono", monospace;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+  }
+  .page-title {
+    padding-left: 25px;
+    font-weight: bold;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 3px #000;
+  }
+  .main-nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px; /* Adjust the gap between navigation links */
+    padding: 0;
+  }
+
+  .main-nav-links a:hover,
+  .main-nav-links a:focus {
+    color: limegreen;
+    background-color: #ccc; /* Hover background color */
+    transform: scale(1.2); /* Example transform: increase scale on hover */
+  }
+
+  .main-nav-links a {
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    padding: 10px 20px; /* Adjust padding for each link */
+    transition: all 0.3s ease;
+    transform-origin: center; /* Set the transform origin to the center */
+    display: inline-block; /* Ensures the anchor tags behave like block elements */
+  }
+
+  .main-nav-link {
+    margin-right: 10px;
+    text-decoration: none;
+    color: #fff;
+    margin-left: 15px;
+  }
+
+  .hamburger {
+    display: none;
+    cursor: pointer;
+  }
+
+  .line {
+    width: 30px;
+    height: 3px;
+    background-color: #ccc;
+    margin: 5px 0;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .main-nav-links {
+      display: none;
+    }
+
+    .hamburger {
+      display: block;
+    }
+  }
+</style>

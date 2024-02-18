@@ -1,15 +1,20 @@
 ---
+/* TODO:
+1. Make sure user has enough money to place a bet
+2. Dont reset wheel every time but account for spin
+3. Better Styles
 
+*/
 ---
-<link href="https://fonts.googleapis.com/css2?family=Kode+Mono&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-<p id="money">$<span id="amount">1000</span></p>
+
 <p>Place Bets:</p>
 <div class="input-container">
-  <input id="yellow-bet" type="number" min="1" placeholder="×2" />
-  <input id="green-bet" type="number" min="1" placeholder="×4" />
-  <input id="blue-bet" type="number" min="1" placeholder="×6" />
-  <input id="pink-bet" type="number" min="1" placeholder="×12" />
-  <input id="red-bet" type="number" min="1" placeholder="×25" />
+  <!-- Bet input field: Positive integer numbers only -->
+  <input id="yellow-bet" type="number" min="1" step="1" placeholder="×2" />
+  <input id="green-bet" type="number" min="1" step="1" placeholder="×4" />
+  <input id="blue-bet" type="number" min="1" step="1" placeholder="×6" />
+  <input id="hotpink-bet" type="number" min="1" step="1" placeholder="×12" />
+  <input id="red-bet" type="number" min="1" step="1" placeholder="×25" />
 </div>
 <p id="lastColor"></p>
 <div class="wheel-container">
@@ -21,7 +26,6 @@
 <script type="module" src="src/scripts/wheel.js"></script>
 
 <style>
-
   h1 {
     font-family: "Kode Mono", monospace;
     color: white;
@@ -31,7 +35,7 @@
 
   p {
     font-family: "Kode Mono", monospace;
-    color: silver;
+    color: white;
     font-size: 2em;
     text-align: center;
   }
@@ -41,9 +45,9 @@
     justify-content: center;
     align-items: center;
     margin: auto;
-    color: white;
+    color: black;
   }
-  
+
   .input-container input {
     margin-right: 10px;
     font-size: 16px;
@@ -52,23 +56,26 @@
   }
 
   input {
-    width: 100px;
+    width: 5%;
     height: 30px;
     margin: 10px;
     text-align: center;
+    border-radius: 25px;
+    border: 2px solid rgb(37, 37, 37);
+  }
+
+  input::placeholder {
+    color: black;
+  }
+
+  input:focus::placeholder {
+    opacity: 0;
   }
 
   #lastColor {
     color: white;
     font-size: 2em;
     text-align: center;
-  }
-
-  #money {
-    color: white;
-    margin: 0px;
-    font-size: 4em;
-    color: limegreen;
   }
 
   .arrow {
@@ -92,24 +99,23 @@
     /*overflow: hidden; /* Prevent content from extending beyond container */
   }
 
-  #red-bet {
-    background-color: red;
-  }
-
   #yellow-bet {
     background-color: yellow;
   }
-
   #green-bet {
     background-color: green;
   }
-
   #blue-bet {
     background-color: blue;
   }
-
-  #pink-bet {
+  #hotpink-bet {
     background-color: hotpink;
+  }
+  #red-bet {
+    background-color: red;
+  }
+  .glow {
+    box-shadow: 0 0 10px 5px white;
   }
 
   #wheel {
@@ -178,7 +184,7 @@
     right: 35%;
     bottom: 35%;
 
-    box-shadow: inset 0 0 15px 5px #333;
+    box-shadow: inset 0 0 15px 15px #333;
     /*border: 5px solid black;*/
     background-color: gray;
     border-radius: 50%;
@@ -190,10 +196,26 @@
     pointer-events: none;
   }
 
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   @media (max-width: 1500px) {
-    /* Add your CSS rules here */
     .wheel-container {
       width: 80%;
+    }
+    input {
+      width: 10%;
+      height: 30px;
+      margin: 10px;
+      text-align: center;
+      border-radius: 25px;
     }
   }
 </style>
