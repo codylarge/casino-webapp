@@ -32,7 +32,8 @@ const colorSegments = [
 const colorOptions = ["yellow", "green", "blue", "hotpink", "red"];
 
 // Site-Wide money variable (Session storage)
-const storage = sessionStorage.getItem("money");
+let storage = sessionStorage.getItem("money");
+if (storage == null) storage = "1000";
 let money = parseInt(storage);
 console.log("money: " + money);
 // Users inputs (Referenced in almost every method so I just made it global)
@@ -104,6 +105,7 @@ const spinTo = (angle) => {
     console.log("session storage money: " + sessionStorage.getItem("money"));
     document.querySelector("#money").textContent = `$${money}`; // Changes #money from Nav component
     toggleInputs();
+    clearInputs();
     setTimeout(resetWheel, 1000); // Ensures spin is complete and results are outputted before resetting
   }, SPIN_TIME * 1000);
 };
@@ -206,5 +208,11 @@ const clearInputGlow = () => {
 const toggleInputs = () => {
   for (const input of inputs) {
     input.disabled = !input.disabled;
+  }
+};
+
+const clearInputs = () => {
+  for (const input of inputs) {
+    input.value = "";
   }
 };
