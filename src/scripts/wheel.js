@@ -122,44 +122,44 @@ function countWinnings(lastColor) {
   //console.log("yellow: " + values[0], "green: " + values[1], "blue: " + values[2], "hotpink: " + values[3], "red: " + values[4]);
   let winnings = 0;
   switch (lastColor) {
-    case "yellow":
-      winnings += values[0] * 2;
+    case colorOptions[0]:
+      winnings += values[0];
       winnings -= values[1];
       winnings -= values[2];
       winnings -= values[3];
       winnings -= values[4];
       break;
 
-    case "green":
+    case colorOptions[1]:
       winnings -= values[0];
-      winnings += values[1] * 4;
+      winnings += values[1] * 3;
       winnings -= values[2];
       winnings -= values[3];
       winnings -= values[4];
       break;
 
-    case "blue":
+    case colorOptions[2]:
       winnings -= values[0];
       winnings -= values[1];
-      winnings += values[2] * 6;
+      winnings += values[2] * 5;
       winnings -= values[3];
       winnings -= values[4];
       break;
 
-    case "hotpink":
+    case colorOptions[3]:
       winnings -= values[0];
       winnings -= values[1];
       winnings -= values[2];
-      winnings += values[3] * 12;
+      winnings += values[3] * 11;
       winnings -= values[4];
       break;
 
-    case "red":
+    case colorOptions[4]:
       winnings -= values[0];
       winnings -= values[1];
       winnings -= values[2];
       winnings -= values[3];
-      winnings += values[4] * 25;
+      winnings += values[4] * 24;
       break;
   }
 

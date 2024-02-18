@@ -5,11 +5,7 @@ import Card from "../components/Card.astro";
 
 <Layout title="Welcome to Astro.">
   <main>
-    <h1>Welcome to <span class="text-gradient">The Casino</span></h1>
-    <p class="instructions">
-      Welcome to <code>The Casino</code> where dreams come true. Feel free to play
-      any of the games and win free money just like in real life.
-    </p>
+    <h1>Welcome to <span class="h1-alt">The Casino</span></h1>
     <ul role="list" class="link-card-grid">
       <Card
         href="wheel"
@@ -32,10 +28,34 @@ import Card from "../components/Card.astro";
         body="Watch the horses race and bet on your favorite"
       />
     </ul>
+    <p class="bankrupt">
+      Broke? No problem <code>Declare Bankruptcy</code> so you can get back to whats
+      important, gambling.
+    </p>
   </main>
 </Layout>
 
 <style>
+  h1 {
+    -webkit-text-stroke: 1px black;
+    text-shadow: 5px 5px 5px black;
+    color: rgb(255, 255, 255);
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 1em;
+  }
+
+  .h1-alt {
+    -webkit-text-stroke: 0px;
+    color: #00a2ff;
+    text-shadow:
+      0 0 10px #ffffff,
+      0 0 20px #00a2ff,
+      0 0 30px #00a2ff,
+      0 0 70px #00a2ff,
+      2px 2px 5px#00a2ff;
+  }
+
   main {
     margin: auto;
     padding: 1rem;
@@ -54,13 +74,7 @@ import Card from "../components/Card.astro";
     height: auto;
     z-index: -1;
   }
-  h1 {
-    font-size: 4rem;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 1em;
-  }
+
   .text-gradient {
     background-image: var(--accent-gradient);
     -webkit-background-clip: text;
@@ -68,7 +82,7 @@ import Card from "../components/Card.astro";
     background-size: 400%;
     background-position: 0%;
   }
-  .instructions {
+  .bankrupt {
     margin-bottom: 2rem;
     border: 1px solid rgba(var(--accent-light), 25%);
     background: linear-gradient(
@@ -78,15 +92,15 @@ import Card from "../components/Card.astro";
     padding: 1.5rem;
     border-radius: 8px;
   }
-  .instructions code {
+  .bankrupt code {
     font-size: 0.8em;
     font-weight: bold;
-    background: rgba(var(--accent-light), 12%);
-    color: rgb(var(--accent-light));
+    background: black;
+    color: red;
     border-radius: 4px;
     padding: 0.3em 0.4em;
   }
-  .instructions strong {
+  .bankrupt strong {
     color: rgb(var(--accent-light));
   }
   .link-card-grid {
