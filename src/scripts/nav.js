@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "resize",
     function () // Resize in case user reverts size of window back to desktop
     {
-      if (window.innerWidth > 1000) {
+      if (window.innerWidth > 1200) {
         navLinks.style.display = "flex";
       } else {
         if (navLinks.style.display === "flex") {
