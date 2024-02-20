@@ -62,9 +62,15 @@
 
   .main-nav-links a:hover,
   .main-nav-links a:focus {
-    color: orangered;
-    background-color: rgb(255, 255, 119);
-    transform: scale(1.2); /* Example transform: increase scale on hover */
+    color: black;
+    background-color: rgb(236, 244, 255);
+    box-shadow:
+      0 0 10px #ffffff,
+      0 0 20px #00a2ff,
+      0 0 30px #00a2ff,
+      0 0 70px #00a2ff,
+      2px 2px 5px#00a2ff;
+    border: 2px solid rgba(255,255,255,0);  
   }
 
   .main-nav-links a {
@@ -78,10 +84,11 @@
 
     /* Decoration */
     border: 2px solid #000;
-    background-color: rgb(255, 255, 69);
-    box-shadow: inset 0 0 15px 5px rgb(255, 255, 194); /* Adjust shadow properties as needed */
+    border-radius: 5px;
+    background-color: rgb(54, 138, 255);
+    box-shadow: inset 0 0 10px 5px rgb(18, 32, 46); /* Adjust shadow properties as needed */
 
-    /* Tranformation */
+    /* Transformation */
     transform-origin: center; /* Set the transform origin to the center */
     display: inline-block; /* Ensures the anchor tags behave like block elements */
     padding: 15px 30px; /* Adjust padding for each link */
@@ -98,6 +105,7 @@
   .hamburger {
     display: none;
     cursor: pointer;
+    padding-inline: 20px;
   }
 
   .line {
@@ -107,7 +115,7 @@
     margin: 5px 0;
   }
 
-  @media screen and (max-width: 1000px) {
+  @media screen and (max-width: 1200px) {
     .main-nav-links {
       display: none;
     }
