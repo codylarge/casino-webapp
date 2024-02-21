@@ -1,0 +1,24 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PokerLayout from "../layouts/PokerLayout.astro";
+
+const { title } = Astro.props;
+
+const pokerHands: { hand: string; points: number }[] = [
+  { hand: "Royal flush", points: 10000 },
+  { hand: "4 aces", points: 5000 },
+  { hand: "Straight flush", points: 1000 },
+  { hand: "4 2s,3s,4s", points: 750 },
+  { hand: "4 5s thru Ks", points: 500 },
+  { hand: "Full house", points: 100 },
+  { hand: "Flush", points: 50 },
+  { hand: "Straight", points: 20 },
+  { hand: "3 of a kind", points: 10 },
+  { hand: "2 pairs", points: 5 },
+  { hand: "Jacks or better", points: 5 },
+];
+---
+
+<PokerLayout title={`${title}`} points={pokerHands}>
+  <main></main>
+</PokerLayout>

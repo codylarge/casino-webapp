@@ -1,0 +1,103 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+interface Props {
+  title: string;
+  points: {
+    hand: string;
+    points: number;
+  }[];
+}
+
+const { title, points } = Astro.props;
+
+const midpoint = Math.ceil(points.length / 2.5);
+
+const leftPoints = points.slice(0, midpoint);
+const rightPoints = points.slice(midpoint);
+
+const boxWidth = "100px"; // Width of the points tables
+
+// Styles for points tables
+const handStyles =
+  "color: white; padding: 10px; border: 2px solid orange; font-weight: bold; background-color: black; width: 100px;";
+
+const pointStyles =
+  "color: yellow; padding: 10px; border: 2px solid orange; background-color: black;";
+
+const leftPointsTable = leftPoints
+  .map(
+    (points, index) => `
+    <table class="points-table">
+      <tr><td style="${handStyles}">${points.hand}</td></tr>
+      <tr><td style="${pointStyles}">${points.points}</td></tr>
+    </table>
+  `
+  )
+  .join("");
+
+const rightPointsTable = rightPoints
+  .map(
+    (points, index) => `
+    <table class="points-table">
+        <tr><td style="${handStyles}">${points.hand}</td></tr>
+      <tr><td style="${pointStyles}">${points.points}</td></tr>
+    </table>
+  `
+  )
+  .join("");
+---
+
+<Layout title={title}>
+  <div class="container">
+    <ul class="left-menu">
+      <li>
+        <table class="points-table">
+          <tbody set:html={leftPointsTable} />
+        </table>
+      </li>
+    </ul>
+
+    <div class="cards"></div>
+
+    <ul class="right-menu">
+      <li>
+        <table class="points-table">
+          <tbody set:html={rightPointsTable} />
+        </table>
+      </li>
+    </ul>
+  </div>
+  <script src="../scripts/dealCards.js"></script>
+</Layout>
+<style>
+  .cards {
+    padding-top: 50px;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .left-menu,
+  .right-menu {
+    list-style: none;
+    padding: 50px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .left-menu li,
+  .right-menu li {
+    display: block;
+    padding-bottom: 20px;
+    text-align: center;
+  }
+
+  .points-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+</style>
