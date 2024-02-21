@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Nav from "../components/Nav.astro";
+import PokerMenu from "../components/PokerMenu.astro";
 interface Props {
   title: string;
   points: {
@@ -16,9 +16,7 @@ const midpoint = Math.ceil(points.length / 2.5);
 const leftPoints = points.slice(0, midpoint);
 const rightPoints = points.slice(midpoint);
 
-const boxWidth = "100px"; // Width of the points tables
-
-// Styles for points tables
+// Styles for points tables. Not ideal but wont work in css for some reason
 const handStyles =
   "color: white; padding: 10px; border: 2px solid orange; font-weight: bold; background-color: black; width: 100px;";
 
@@ -28,7 +26,7 @@ const pointStyles =
 const leftPointsTable = leftPoints
   .map(
     (points, index) => `
-    <table class="points-table">
+    <table class="points-table" style="padding-bottom:20px;">
       <tr><td style="${handStyles}">${points.hand}</td></tr>
       <tr><td style="${pointStyles}">${points.points}</td></tr>
     </table>
@@ -39,7 +37,7 @@ const leftPointsTable = leftPoints
 const rightPointsTable = rightPoints
   .map(
     (points, index) => `
-    <table class="points-table">
+    <table class="points-table" style="padding-bottom:20px;">
         <tr><td style="${handStyles}">${points.hand}</td></tr>
       <tr><td style="${pointStyles}">${points.points}</td></tr>
     </table>
@@ -68,7 +66,7 @@ const rightPointsTable = rightPoints
       </li>
     </ul>
   </div>
-  <script src="../scripts/dealCards.js"></script>
+  <PokerMenu></PokerMenu>
 </Layout>
 <style>
   .cards {
@@ -79,7 +77,7 @@ const rightPointsTable = rightPoints
     display: flex;
     justify-content: space-between;
   }
-
+  
   .left-menu,
   .right-menu {
     list-style: none;
@@ -96,8 +94,5 @@ const rightPointsTable = rightPoints
     text-align: center;
   }
 
-  .points-table {
-    border-collapse: collapse;
-    width: 100%;
-  }
 </style>
+<script src="../scripts/dealCards.js"></script>

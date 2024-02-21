@@ -36,35 +36,53 @@ function shuffleArray(array) {
     return array;
 }
 
-const cardImages = generateCardImagePaths(cards);
-
-const shuffledCards = shuffleArray(cards);
-// Select the first 5 shuffled cards
-const selectedCards = shuffledCards.slice(0, 5);
-
-function dealHand(cards) {
+function initializeCards(cards, rowNumber) {
     const rowDiv = document.createElement('div');
-    rowDiv.classList.add('row');
+    rowDiv.classList.add('row', `row-${rowNumber}`); // Assign a class for the row number
+    rowDiv.id = `row-${rowNumber}`; // Assigning a unique ID to each row
+
+    let cardNumber = 1;
     cards.forEach(cardTitle => {
         const img = document.createElement('img');
-        img.src = cardImages[cardTitle]; // Assuming you have a cardImages object with paths
-        img.alt = cardTitle; // Set alt attribute to the card title
+        img.src = cardImages[cardTitle];
+        img.alt = cardTitle;
+        img.classList.add(`row-${rowNumber}`); // Add class for row
+        img.id = `card-${rowNumber}-${cardNumber}`; // Assign an ID based on row and card number
         rowDiv.appendChild(img);
+        cardNumber++;
     });
     return rowDiv;
 }
 
-// Find the container element
 const cardsContainer = document.querySelector('.cards');
 
-// Generate and append the rows
-let remainingCards = selectedCards.length;
-while (remainingCards > 0) {
-    const cardsInRow = Math.min(remainingCards, 5);
-    const rowCards = selectedCards.splice(0, cardsInRow);
-    const rowElement = dealHand(rowCards);
-    cardsContainer.appendChild(rowElement);
-    remainingCards -= cardsInRow;
+// Generate and append the Hand
+function dealHand(selectedCards, rows) {
+    const cardsPerRow = Math.ceil(selectedCards.length / rows);
+    let currentRow = 1;
+    let currentIndex = 0;
+
+    while (currentRow <= rows && currentIndex < selectedCards.length) {
+        // Calculate the number of cards for the current row. 
+        // This is usually cardsPerRow, except for possibly the last iteration, 
+        // where it might be less if the number of cards isn't evenly divisible.
+        const rowCardsCount = Math.min(cardsPerRow, selectedCards.length - currentIndex);
+        const rowCards = selectedCards.slice(currentIndex, currentIndex + rowCardsCount);
+        const rowElement = initializeCards(rowCards, currentRow);
+        cardsContainer.appendChild(rowElement);
+        currentIndex += rowCardsCount;
+        currentRow++;
+        
+        for (let i = 0; i < 2; i++) {
+            cardsContainer.appendChild(document.createElement('br'));
+        }
+    }
 }
 
+const cardImages = generateCardImagePaths(cards);
+const shuffledCards = shuffleArray(cards);
+const selectedCards = shuffledCards.slice(0, 20); // Number of cards to generate
+const rows = 4; // Number of rows to generate
+
+dealHand(selectedCards, rows)
 console.log(cardImages);
