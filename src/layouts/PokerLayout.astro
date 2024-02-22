@@ -25,7 +25,7 @@ const pointStyles =
 
 const leftPointsTable = leftPoints
   .map(
-    (points, index) => `
+    (points) => `
     <table class="points-table" style="padding-bottom:20px;">
       <tr><td style="${handStyles}">${points.hand}</td></tr>
       <tr><td style="${pointStyles}">${points.points}</td></tr>
@@ -36,7 +36,7 @@ const leftPointsTable = leftPoints
 
 const rightPointsTable = rightPoints
   .map(
-    (points, index) => `
+    (points) => `
     <table class="points-table" style="padding-bottom:20px;">
         <tr><td style="${handStyles}">${points.hand}</td></tr>
       <tr><td style="${pointStyles}">${points.points}</td></tr>

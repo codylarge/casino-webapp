@@ -59,27 +59,36 @@ function initializeCards(cards, rowNumber) {
 }
 
 const cardsContainer = document.querySelector('.cards');
+
 // Generate and append the Hand
 function dealHands(selectedCards, rows) {
     const cardsPerRow = Math.ceil(selectedCards.length / rows);
     let currentRow = 1;
     let currentIndex = 0; // current card in row
-
     const keptCards = document.querySelectorAll('.keep');
     const keptCols = getKeptCols(keptCards);
-    let lastKept = keptCards.length;
+    cardsContainer.innerHTML = '';
 
     while (currentRow <= rows && currentIndex < selectedCards.length) {
         const rowCardsCount = Math.min(cardsPerRow, selectedCards.length - currentIndex);
         const rowCards = selectedCards.slice(currentIndex, currentIndex + rowCardsCount);
+
+        let keptIndex = 0;
+        for (let i = 0; i < rowCards.length; i++) {
+            if (keptCols.includes((i + 1).toString())) {
+                rowCards[i] = keptCards[keptIndex].alt; // Replace with the corresponding kept card name (alt attribute)
+                keptIndex++;
+            }
+        }
         const rowElement = initializeCards(rowCards, currentRow);
+    
         cardsContainer.appendChild(rowElement);
+
         currentIndex += rowCardsCount;
         currentRow++;
-
-        for (let i = 0; i < 2; i++) {
-            cardsContainer.appendChild(document.createElement('br'));
-        }
+        
+        // Add 2 line breaks after each row
+        for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'));
     }
 }
 
@@ -103,6 +112,7 @@ document.querySelector('.draw').addEventListener('click', startRound);
 document.querySelector('.redraw').addEventListener('click', dealRedraw);
 
 function startRound() {
+    resetGame();
     const startingCards = []
     const splicedCards = shuffledCards.slice(0, cardsPerHand);
     const hand = shuffledCards.splice(0, cardsPerHand);
@@ -112,9 +122,9 @@ function startRound() {
     setUserCanSelectCards(true);
     toggleDrawRedraw();
 
-
-
     // End of round replenish & reshuffle cards
+    shuffledCards.push(...splicedCards);
+    shuffleArray(shuffledCards);
 }
 
 function handleClick() {
@@ -122,8 +132,6 @@ function handleClick() {
 }
 
 // Make sure only either draw or redraw is visible
-
-
 function dealRedraw() {
     const numHands = parseInt(document.querySelector('.num-hands').textContent);
     toggleDrawRedraw();
@@ -137,7 +145,6 @@ function dealRedraw() {
     }
 
     dealHands(selectedCards, numHands);
-    shuffledCards.push(...splicedCards);
     shuffleArray(shuffledCards);
 }
 
@@ -148,15 +155,25 @@ const toggleDrawRedraw = () => {
     redrawButton.classList.toggle('hide');
 }
 
-function setUserCanSelectCards(val) {
+function setUserCanSelectCards(canCurrentlySelect) {
     const firstRowCards = document.querySelectorAll('.row-1 img');
-    if (val) {
+    if (canCurrentlySelect) {
         for (const card of firstRowCards)
             card.addEventListener('click', handleClick);
     } else {
         for (const card of firstRowCards)
             card.removeEventListener('click', handleClick);
     }
+}
+
+function resetGame() {
+    cardsContainer.innerHTML = '';
+    
+    selectedCards.length = 0;
+    
+    canSelectCards = false;
+
+    // Optionally, reset any UI elements or game state as needed
 }
 
 // Allow user to change number of hands
