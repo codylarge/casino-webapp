@@ -1,34 +1,38 @@
 <footer class="footer">
-    <div class="win-bar">
-      <span>Win: </span>
-      <span class="win-counter">0</span>
-    </div>
-  </footer>
+  <button class="speed">Speed<span class="draw-speed"> ></span></button>
+  <button class="bet">Bet:<span class="bet-amount">10</span></button>
+  <div class="win-bar">
+    <span>Win:</span>
+    <span class="win-counter">0</span>
+  </div>
+  <button class="hands">Hands:<span class="num-hands">1</span></button>
+  <button class="draw">Draw</button>
+</footer>
 
 <style>
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-}
+  .footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+  }
 
-.win-bar {
-  display: inline-block;
-  background-color: #555;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
+  .win-bar {
+    display: inline-block;
+    background-color: #555;
+    padding: 10px 10px;
+    border-radius: 5px;
+  }
 
-.win-bar span {
-  margin-right: 5px;
-}
+  .win-bar span {
+    margin-right: 5px;
+  }
 
-.win-counter {
-  font-weight: bold;
-}
+  .win-counter {
+    font-weight: bold;
+  }
 </style>
