@@ -48,7 +48,7 @@ function initializeCards(cards, rowNumber) {
         const img = document.createElement('img');
         img.src = cardImages[cardTitle];
         img.alt = cardTitle;
-        img.classList.add(`card`); // Add class for row
+        img.classList.add(`row-${rowNumber}`); // Add class for row
         img.id = `card-${rowNumber}-${cardNumber}`; // Assign an ID based on row and card number
         rowDiv.appendChild(img);
         cardNumber++;
@@ -83,11 +83,34 @@ const selectedCards = []
 
 // Start game by clicking draw
 document.querySelector('.draw').addEventListener('click', startRound);
+document.querySelector('.redraw').addEventListener('click', startRound);
 
 function startRound() {
     const hand = shuffledCards.splice(0, cardsPerHand);
     selectedCards.push(...hand);
     dealHands(selectedCards, 1);
+    selectCardToKeep();
+    toggleDrawRedraw();
+}
+
+function selectCardToKeep() {
+    const firstRowCards = document.querySelectorAll('.row-1 img');
+    for (const card of firstRowCards) {
+        card.addEventListener('click', handleClick);
+    }
+}
+
+function handleClick() {
+    this.classList.toggle('keep'); // Toggle the "keep" class on the clicked card
+    console.log(this);
+}
+
+// Make sure only either draw or redraw is visible
+const toggleDrawRedraw = () => {
+    const drawButton = document.querySelector('.draw');
+    const redrawButton = document.querySelector('.redraw');
+    drawButton.classList.toggle('hide');
+    redrawButton.classList.toggle('hide');
 }
 
 function drawCards() {
@@ -103,7 +126,6 @@ function drawCards() {
     }
     dealHands(selectedCards, numHands);
 }
-
 
 // Allow user to change number of hands
 document.querySelector('.hands').addEventListener('click', toggleNumHands);
