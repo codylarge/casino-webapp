@@ -17,6 +17,7 @@ const covers = [
     "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
 const cardsPerHand = 5; // Number of cards per hand
+let canSelectCards = false; // Whether the user can select cards to keep
 
 // Function to generate image paths for each card
 function generateCardImagePaths(cards) {
@@ -48,6 +49,7 @@ function initializeCards(cards, rowNumber) {
         const img = document.createElement('img');
         img.src = cardImages[cardTitle];
         img.alt = cardTitle;
+        img.classList.add('card'); // Add class for row
         img.classList.add(`row-${rowNumber}`); // Add class for row
         img.id = `card-${rowNumber}-${cardNumber}`; // Assign an ID based on row and card number
         rowDiv.appendChild(img);
@@ -61,7 +63,11 @@ const cardsContainer = document.querySelector('.cards');
 function dealHands(selectedCards, rows) {
     const cardsPerRow = Math.ceil(selectedCards.length / rows);
     let currentRow = 1;
-    let currentIndex = 0;
+    let currentIndex = 0; // current card in row
+
+    const keptCards = document.querySelectorAll('.keep');
+    const keptCols = getKeptCols(keptCards);
+    let lastKept = keptCards.length;
 
     while (currentRow <= rows && currentIndex < selectedCards.length) {
         const rowCardsCount = Math.min(cardsPerRow, selectedCards.length - currentIndex);
@@ -77,35 +83,64 @@ function dealHands(selectedCards, rows) {
     }
 }
 
+function getKeptCols(keptCards) {
+    const keptCols = [];
+    for (const card of keptCards) {
+        const cardId = card.id;
+        const cardCol = cardId.split('-')[2];
+        keptCols.push(cardCol);
+    }
+    console.log(keptCols)
+    return keptCols;
+}
+
 const cardImages = generateCardImagePaths(cards);
 const shuffledCards = shuffleArray(cards);
 const selectedCards = []
 
 // Start game by clicking draw
 document.querySelector('.draw').addEventListener('click', startRound);
-document.querySelector('.redraw').addEventListener('click', startRound);
+document.querySelector('.redraw').addEventListener('click', dealRedraw);
 
 function startRound() {
+    const startingCards = []
+    const splicedCards = shuffledCards.slice(0, cardsPerHand);
     const hand = shuffledCards.splice(0, cardsPerHand);
-    selectedCards.push(...hand);
-    dealHands(selectedCards, 1);
-    selectCardToKeep();
+    startingCards.push(...hand);
+    canSelectCards = true; // lazy toggle method CHANGE
+    dealHands(startingCards, 1);
+    setUserCanSelectCards(true);
     toggleDrawRedraw();
-}
 
-function selectCardToKeep() {
-    const firstRowCards = document.querySelectorAll('.row-1 img');
-    for (const card of firstRowCards) {
-        card.addEventListener('click', handleClick);
-    }
+
+
+    // End of round replenish & reshuffle cards
 }
 
 function handleClick() {
     this.classList.toggle('keep'); // Toggle the "keep" class on the clicked card
-    console.log(this);
 }
 
 // Make sure only either draw or redraw is visible
+
+
+function dealRedraw() {
+    const numHands = parseInt(document.querySelector('.num-hands').textContent);
+    toggleDrawRedraw();
+    setUserCanSelectCards(false);
+
+    // Take exactly as many cards as needed out of shuffled cards
+    for (let i = 0; i < numHands; i++) {
+        const startIndex = i * cardsPerHand;
+        const hand = shuffledCards.slice(startIndex, startIndex + cardsPerHand);
+        selectedCards.push(...hand);
+    }
+
+    dealHands(selectedCards, numHands);
+    shuffledCards.push(...splicedCards);
+    shuffleArray(shuffledCards);
+}
+
 const toggleDrawRedraw = () => {
     const drawButton = document.querySelector('.draw');
     const redrawButton = document.querySelector('.redraw');
@@ -113,18 +148,15 @@ const toggleDrawRedraw = () => {
     redrawButton.classList.toggle('hide');
 }
 
-function drawCards() {
-    const numHands = parseInt(document.querySelector('.num-hands').textContent);
-
-    cardsContainer.innerHTML = '';
-
-    // Gives 1 extra hand which acts as the starting hand that the user can choose to keep or 
-    for (let i = 0; i < numHands; i++) {
-        const startIndex = i * cardsPerHand;
-        const hand = shuffledCards.slice(startIndex, startIndex + cardsPerHand);
-        selectedCards.push(...hand);
+function setUserCanSelectCards(val) {
+    const firstRowCards = document.querySelectorAll('.row-1 img');
+    if (val) {
+        for (const card of firstRowCards)
+            card.addEventListener('click', handleClick);
+    } else {
+        for (const card of firstRowCards)
+            card.removeEventListener('click', handleClick);
     }
-    dealHands(selectedCards, numHands);
 }
 
 // Allow user to change number of hands
