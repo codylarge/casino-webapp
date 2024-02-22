@@ -16,6 +16,7 @@ const cards = [
 const covers = [
     "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
+const cardsPerHand = 5; // Number of cards per hand
 
 // Function to generate image paths for each card
 function generateCardImagePaths(cards) {
@@ -47,7 +48,7 @@ function initializeCards(cards, rowNumber) {
         const img = document.createElement('img');
         img.src = cardImages[cardTitle];
         img.alt = cardTitle;
-        img.classList.add(`row-${rowNumber}`); // Add class for row
+        img.classList.add(`card`); // Add class for row
         img.id = `card-${rowNumber}-${cardNumber}`; // Assign an ID based on row and card number
         rowDiv.appendChild(img);
         cardNumber++;
@@ -56,17 +57,13 @@ function initializeCards(cards, rowNumber) {
 }
 
 const cardsContainer = document.querySelector('.cards');
-
 // Generate and append the Hand
-function dealHand(selectedCards, rows) {
+function dealHands(selectedCards, rows) {
     const cardsPerRow = Math.ceil(selectedCards.length / rows);
     let currentRow = 1;
     let currentIndex = 0;
 
     while (currentRow <= rows && currentIndex < selectedCards.length) {
-        // Calculate the number of cards for the current row. 
-        // This is usually cardsPerRow, except for possibly the last iteration, 
-        // where it might be less if the number of cards isn't evenly divisible.
         const rowCardsCount = Math.min(cardsPerRow, selectedCards.length - currentIndex);
         const rowCards = selectedCards.slice(currentIndex, currentIndex + rowCardsCount);
         const rowElement = initializeCards(rowCards, currentRow);
@@ -84,33 +81,32 @@ const cardImages = generateCardImagePaths(cards);
 const shuffledCards = shuffleArray(cards);
 const selectedCards = []
 
-// Update the function to deal a hand based on the number of hands button
+// Start game by clicking draw
+document.querySelector('.draw').addEventListener('click', startRound);
+
+function startRound() {
+    const hand = shuffledCards.splice(0, cardsPerHand);
+    selectedCards.push(...hand);
+    dealHands(selectedCards, 1);
+}
+
 function drawCards() {
     const numHands = parseInt(document.querySelector('.num-hands').textContent);
-    const cardsPerHand = 5; // Number of cards per hand (adjust as needed)
 
-    // Clear previous cards
     cardsContainer.innerHTML = '';
 
-    // Draw cards for each hand
+    // Gives 1 extra hand which acts as the starting hand that the user can choose to keep or 
     for (let i = 0; i < numHands; i++) {
         const startIndex = i * cardsPerHand;
         const hand = shuffledCards.slice(startIndex, startIndex + cardsPerHand);
         selectedCards.push(...hand);
     }
-
-    // Deal the hand
-    dealHand(selectedCards, numHands);
+    dealHands(selectedCards, numHands);
 }
 
 
-// Start game by clicking draw
-document.querySelector('.draw').addEventListener('click', drawCards);
-// Allow user to change # of hangs and bet amount
+// Allow user to change number of hands
 document.querySelector('.hands').addEventListener('click', toggleNumHands);
-document.querySelector('.bet').addEventListener('click', toggleBetAmount);
-
-// Update the function to toggle the number of hands between 1, 3, and 5
 function toggleNumHands() {
     const numHandsElement = document.querySelector('.num-hands');
     let numHands = parseInt(numHandsElement.textContent);
@@ -129,6 +125,8 @@ function toggleNumHands() {
     numHandsElement.innerHTML = numHands;
 }
 
+// Allow user to change bet amount
+document.querySelector('.bet').addEventListener('click', toggleBetAmount);
 function toggleBetAmount() {
     const betAmountElement = document.querySelector('.bet-amount');
     let betAmount = parseInt(betAmountElement.textContent);
