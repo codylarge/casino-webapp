@@ -17,8 +17,9 @@ const covers = [
     "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
 const cardsPerHand = 5; // Number of cards per hand
-let canSelectCards = false; // Whether the user can select cards to keep
 
+
+let canSelectCards = false; // Whether the user can select cards to keep
 // Function to generate image paths for each card
 function generateCardImagePaths(cards) {
     const cardImages = {};
@@ -39,7 +40,7 @@ function shuffleArray(array) {
 }
 
 // Gives each card const its respective image path
-function initializeCards(cards, rowNumber) {
+function initializeCards(cards, rowNumber, keptCols) {
     const rowDiv = document.createElement('div');
     rowDiv.classList.add('row', `row-${rowNumber}`); // Assign a class for the row number
     rowDiv.id = `row-${rowNumber}`; // Assigning a unique ID to each row
@@ -47,6 +48,9 @@ function initializeCards(cards, rowNumber) {
     let cardNumber = 1;
     cards.forEach(cardTitle => {
         const img = document.createElement('img');
+        if (keptCols.includes(cardNumber.toString())) {
+            img.classList.add('keep'); // re-adding kept class to the kept cards 
+        }
         img.src = cardImages[cardTitle];
         img.alt = cardTitle;
         img.classList.add('card'); // Add class for row
@@ -80,7 +84,7 @@ function dealHands(selectedCards, rows) {
                 keptIndex++;
             }
         }
-        const rowElement = initializeCards(rowCards, currentRow);
+        const rowElement = initializeCards(rowCards, currentRow, keptCols);
     
         cardsContainer.appendChild(rowElement);
 
@@ -145,6 +149,7 @@ function dealRedraw() {
     }
 
     dealHands(selectedCards, numHands);
+    calculatePayout(selectedCards);
     shuffleArray(shuffledCards);
 }
 
@@ -214,4 +219,13 @@ function toggleBetAmount() {
     }
 
     betAmountElement.innerHTML = betAmount;
+}
+
+function calculatePayout(hands) {
+    const bet = parseInt(document.querySelector('.bet-amount').textContent);
+    const money = sessionStorage.getItem('money');
+    const payout = 0;
+    console.log("money: ", money, "bet: ", bet);
+    // Calculate the payout based on the hand
+    return payout;
 }
