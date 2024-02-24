@@ -70,7 +70,13 @@ const { title } = Astro.props;
 
     .keep {
       transform: scale(0.9);
-      box-shadow: 0 0 25px rgb(255, 0, 0); /* Adjust the values as needed */
+      opacity: 0.75; /* Adjust the opacity value to make it fainter */
+      filter: brightness(80%) contrast(70%); /* Adjust brightness and contrast to make it look pressed */
+    }
+
+    .kept {
+      transform: scale(0.95);
+      filter: brightness(90%) contrast(80%); /* Adjust brightness and contrast to make it look pressed */
     }
 
     /* -----------<My Styles>------------ */
