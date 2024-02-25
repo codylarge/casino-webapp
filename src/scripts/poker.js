@@ -128,7 +128,7 @@ document.querySelector('.redraw').addEventListener('click', dealRedraw)
 function startRound() {
     toggleBettingButtons()
     let money = parseInt(sessionStorage.getItem('money'))
-    if (money < 1 || bet > money) {
+    if (money < 1 || bet * numHands > money) {
         alert("You do not have enough money to bet: " + bet);
         return;
     }
