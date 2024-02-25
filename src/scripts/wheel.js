@@ -40,7 +40,6 @@ console.log("money: " + money);
 const inputs = document.querySelectorAll('input[type="number"]');
 
 /* ---------------------- */
-
 document.addEventListener("DOMContentLoaded", function () {
   const spinButton = document.getElementById("spin-button");
   spinButton.addEventListener("click", function () {
@@ -55,8 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } while (Math.abs(randomDegree) < min);
 
     console.log("random degree: " + randomDegree);
-
     console.log("total bet: " + getTotalBet());
+    
     if (money < 1 || getTotalBet() > money) {
       alert("You do not have enough money to bet: " + getTotalBet());
       spinButton.classList.remove("unclickable");

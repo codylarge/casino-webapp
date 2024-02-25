@@ -13,13 +13,26 @@ const cards = [
     "king_of_clubs", "king_of_diamonds", "king_of_hearts", "king_of_spades",
     "ace_of_clubs", "ace_of_diamonds", "ace_of_hearts", "ace_of_spades",
 ];
+const pokerHands = [
+    { hand: "Royal flush", points: 10000 },
+    { hand: "4 aces", points: 5000 },
+    { hand: "Straight flush", points: 1000 },
+    { hand: "4 2s,3s,4s", points: 750 },
+    { hand: "4 5s thru Ks", points: 500 },
+    { hand: "Full house", points: 100 },
+    { hand: "Flush", points: 50 },
+    { hand: "Straight", points: 20 },
+    { hand: "3 of a kind", points: 10 },
+    { hand: "2 pairs", points: 5 },
+    { hand: "Jacks or better", points: 5 }
+];
 const covers = [
     "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
 const cardsPerHand = 5; // Number of cards per hand
-let betAmount = 10; // Default bet amount
-
+let bet = 10; // Default bet amount
 let canSelectCards = false; // Whether the user can select cards to keep
+let numHands = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
 // Function to generate image paths for each card
 function generateCardImagePaths(cards) {
     const cardImages = {}
@@ -62,7 +75,6 @@ function initializeCards(cards, rowNumber, keptCols) {
 }
 
 const cardsContainer = document.querySelector('.cards');
-
 // Generate and append the Hand
 function dealHands(selectedCards, rows) {
     const cardsPerRow = Math.ceil(selectedCards.length / rows)
@@ -114,6 +126,12 @@ document.querySelector('.play').addEventListener('click', startRound)
 document.querySelector('.redraw').addEventListener('click', dealRedraw)
 
 function startRound() {
+    let money = parseInt(sessionStorage.getItem('money'))
+    if (money < 1 || bet > money) {
+        alert("You do not have enough money to bet: " + bet);
+        return;
+    }
+    thisBet = bet * numHands
     resetGame()
     const startingCards = []
     const splicedCards = shuffledCards.slice(0, cardsPerHand)
@@ -147,134 +165,54 @@ function dealRedraw() {
     }
 
     dealHands(selectedCards, numHands)
-    calculatePayout(selectedCards)
+    calculatePayout()
     shuffleArray(shuffledCards)
 }
 
-function setUserCanSelectCards(canCurrentlySelect) {
-    const firstRowCards = document.querySelectorAll('.row-1 img')
-    if (canCurrentlySelect) {
-        for (const card of firstRowCards)
-            card.addEventListener('click', handleClick)
-    } else {
-        for (const card of firstRowCards)
-            card.removeEventListener('click', handleClick)
-    }
-}
-
-function resetGame() {
-    cardsContainer.innerHTML = ''
-    
-    selectedCards.length = 0
-    
-    canSelectCards = false
-}
-
-const toggleDrawRedraw = () => {
-    const drawButton = document.querySelector('.play')
-    const redrawButton = document.querySelector('.redraw')
-    drawButton.classList.toggle('hide')
-    redrawButton.classList.toggle('hide')
-}
-
-// Allow user to change number of hands
-document.querySelector('.hands').addEventListener('click', toggleNumHands)
-function toggleNumHands() {
-    const numHandsElement = document.querySelector('.num-hands')
-    let numHands = parseInt(numHandsElement.textContent)
-    switch (numHands) {
-        case 1:
-            numHands = 3
-            break
-        case 3:
-            numHands = 5
-            break
-        default: // 5
-            numHands = 1
-            break
-    }
-
-    numHandsElement.innerHTML = numHands;
-}
-
-// Allow user to change bet amount
-document.querySelector('.bet').addEventListener('click', toggleBetAmount)
-function toggleBetAmount() {
-    const betAmountElement = document.querySelector('.bet-amount')
-    let desiredBetAmount = parseInt(betAmountElement.textContent)
-
-    switch (desiredBetAmount) {
-        case 10: case 100:
-            betAmount = betAmount * 5
-            break;
-        case 50: case 500:
-            betAmount = betAmount * 2
-            break;
-        default: // 1000
-            betAmount = 10
-    }
-    betAmountElement.innerHTML = betAmount;
-}
-
-// Given a card img, return the card's alt attribute (full name) or numeric value (11,12,13,14 -> J,Q,K,A)
-function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) { 
-    let cardValues = []
-    if(verbosity === 1) { // Return cards as their alt attribute (name and suit)
-        for(let card of cards) {
-            cardValues.push(card.alt)
-        }
-        return cardValues
-    }
-
-    else if(verbosity === 0) { // Return cards as their number value
-        for(let card of cards) {
-            let cardValue = card.alt.split('_')[0] // Get the card name from the alt attribute
-            if(cardValue === "jack") cardValue = "11"
-            else if (cardValue === "queen") cardValue = "12"
-            else if (cardValue === "king") cardValue = "13"
-            else if (cardValue === "ace") cardValue = "14"
-            cardValues.push(parseInt(cardValue))
-        }
-        return cardValues
-    }
-}
-
-function calculatePayout(hands, keptCards) {
+function calculatePayout() {
+    const winningsDisplay = document.querySelector('.win-counter')
     const bet = parseInt(document.querySelector('.bet-amount').textContent)
-    const money = sessionStorage.getItem('money')
-    const payout = 0
-    console.log("money: ", money, "bet: ", bet)
+
     const cardsInPlay = getCards(1)
     const cardValuesInPlay = getCards(0)
-    console.log(cardsInPlay)
     
-    let totalWin = evaluateByRow(cardsInPlay, cardValuesInPlay)
+    const payout = evaluateByRow(cardsInPlay, cardValuesInPlay)
+    winningsDisplay.textContent = payout * bet / 10
     // Calculate the payout based on the hand
-    return payout;
+    
+
 }
 
 // checks for pairs, full house and 4 of a kind. 
 function evaluateByRow(cardsInPlay, cardValuesInPlay) {
     const rows = cardValuesInPlay.length / cardsPerHand;
+    const betAmount = parseInt(document.querySelector('.bet-amount').textContent)
     let totalWin = 0;
+
     for(let i = 0; i < rows; i++) {
         const currentRow = document.getElementById(`row-${i+1}`)
         const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
         const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
         const winnings = evaluateHand(handCards, sortedHand)
         
-        totalWin += winnings
-        console.log("Winnings: ", winnings)
-        if (winnings > 0) {
-            const winDisplay = document.createElement('div');
-            winDisplay.textContent = `Win: ${winnings}`;
-            winDisplay.classList.add('win-display'); // You can style this class in your CSS
-            currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling);
+        if (winnings != null) {
+            let winningHand = winnings[0]
+            let winAmount = winnings[1]
+            totalWin += winnings[1]
+            const winDisplay = document.createElement('div')
+            winDisplay.textContent = `${winnings[0]}: ${winnings[1] * betAmount / 10}`; // Display the ROWS winnings
+            winDisplay.classList.add('win-display'); 
+            currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
         }
     }
     return totalWin
 }
 
+function updateMoney(increaseAmount) {
+    const money = parseInt(sessionStorage.getItem('money'))
+    sessionStorage.setItem('money', (money + increaseAmount).toString())
+    document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
+}
 // Gets hand in number form
 function countOccurrences(hand) {
     const occurrences = {}; // {0 0 0 0 0}
@@ -326,19 +264,19 @@ function evaluateHand(cardsInPlay, sortedHand) {
         } 
     }
 
-    if(isRoyal && isFlush && isStraight) return 10000;
-    if(quadAces > 0) return 5000;
-    if(isStraight && isFlush) return 1000;
-    if(quadLow > 0) return 750;
-    if(quadHigh > 0) return 500;
-    if(threeOfAKind > 0 && (lowPairs > 0 || jackOrBetterPairs > 0)) return 100; // Full House
-    if(isFlush) return 50;
-    if(isStraight) return 20;
-    if(threeOfAKind > 0) return 10;
-    if(lowPairs > 1 || jackOrBetterPairs > 1 || (lowPairs > 0 && jackOrBetterPairs > 0)) return 5; // 2 Pair
-    if(jackOrBetterPairs > 0) return 5;
+    if(isRoyal && isFlush && isStraight) return getHandTuple("royal");
+    if(quadAces > 0) return getHandTuple("4 aces");
+    if(isStraight && isFlush) return getHandTuple("straight flush");
+    if(quadLow > 0) return getHandTuple("4 2s,3s,4s");
+    if(quadHigh > 0) return getHandTuple("4 5s thru Ks");
+    if(threeOfAKind > 0 && (lowPairs > 0 || jackOrBetterPairs > 0)) return getHandTuple("full house");
+    if(isFlush) return getHandTuple("flush");
+    if(isStraight) return getHandTuple("straight");
+    if(threeOfAKind > 0) return getHandTuple("3 of a kind");
+    if(lowPairs > 1 || jackOrBetterPairs > 1 || (lowPairs > 0 && jackOrBetterPairs > 0)) return getHandTuple("2 pairs");
+    if(jackOrBetterPairs > 0) return getHandTuple("Jacks or better");
 
-    return 0;
+    return null;
 }
 
 function checkFlush(cardsInPlay) {
@@ -359,6 +297,102 @@ function checkStraight(sortedHand) {
     return true
 }
 
+function setUserCanSelectCards(canCurrentlySelect) {
+    const firstRowCards = document.querySelectorAll('.row-1 img')
+    if (canCurrentlySelect) {
+        for (const card of firstRowCards)
+            card.addEventListener('click', handleClick)
+    } else {
+        for (const card of firstRowCards)
+            card.removeEventListener('click', handleClick)
+    }
+}
+
+function resetGame() {
+    cardsContainer.innerHTML = ''
+    
+    selectedCards.length = 0
+    
+    canSelectCards = false
+}
+
+const toggleDrawRedraw = () => {
+    const drawButton = document.querySelector('.play')
+    const redrawButton = document.querySelector('.redraw')
+    drawButton.classList.toggle('hide')
+    redrawButton.classList.toggle('hide')
+}
+
+// Allow user to change number of hands
+document.querySelector('.hands').addEventListener('click', toggleNumHands)
+function toggleNumHands() {
+    const numHandsElement = document.querySelector('.num-hands')
+    switch (numHands) {
+        case 1:
+            numHands = 3
+            break
+        case 3:
+            numHands = 5
+            break
+        default: // 5
+            numHands = 1
+            break
+    }
+
+    numHandsElement.innerHTML = numHands;
+}
+
+// Allow user to change bet amount
+document.querySelector('.bet').addEventListener('click', toggleBetAmount)
+function toggleBetAmount() {
+    const betAmountElement = document.querySelector('.bet-amount')
+    let desiredBetAmount = parseInt(betAmountElement.textContent)
+
+    switch (desiredBetAmount) {
+        case 10: case 100:
+            bet = bet * 5
+            break;
+        case 50: case 500:
+            bet = bet * 2
+            break;
+        default: // 1000
+        bet = 10
+    }
+    betAmountElement.innerHTML = bet;
+}
+
+// Given a card img, return the card's alt attribute (full name) or numeric value (11,12,13,14 -> J,Q,K,A)
+function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) { 
+    let cardValues = []
+    if(verbosity === 1) { // Return cards as their alt attribute (name and suit)
+        for(let card of cards) {
+            cardValues.push(card.alt)
+        }
+        return cardValues
+    }
+
+    else if(verbosity === 0) { // Return cards as their number value
+        for(let card of cards) {
+            let cardValue = card.alt.split('_')[0] // Get the card name from the alt attribute
+            if(cardValue === "jack") cardValue = "11"
+            else if (cardValue === "queen") cardValue = "12"
+            else if (cardValue === "king") cardValue = "13"
+            else if (cardValue === "ace") cardValue = "14"
+            cardValues.push(parseInt(cardValue))
+        }
+        return cardValues
+    }
+}
+
 function getSuitFromCard(card) {
     return card.split('_')[2]
+}
+
+function getHandTuple(handName) {
+    const hand = pokerHands.find(handObj => handObj.hand.toLowerCase() == handName.toLowerCase());
+    if (hand) {
+        return [hand.hand, hand.points];
+    } else {
+        return null; // Should never happen but just in case
+    }
 }

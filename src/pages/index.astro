@@ -22,11 +22,16 @@ import Card from "../components/Card.astro";
 
     </ul>
     <p class="bankrupt">
-      Broke? No problem <code>Declare Bankruptcy</code> so you can get back to whats
+      Broke? No problem <button type="button" class="mainbutton" id="bankruptcy">
+        <div class="mainbutton-top">Declare Bankruptcy</div>
+        <div class="mainbutton-bottom"></div>
+        <div class="mainbutton-base"></div>
+      </button> so you can get back to whats
       important, gambling.
     </p>
   </main>
 </Layout>
+<script src="../scripts/bankruptcy.js"></script>
 
 <style>
   h1 {
@@ -58,6 +63,7 @@ import Card from "../components/Card.astro";
     font-size: 20px;
     line-height: 1.6;
   }
+  
   .astro-a {
     position: absolute;
     top: -32px;
@@ -68,18 +74,11 @@ import Card from "../components/Card.astro";
     z-index: -1;
   }
 
-  .text-gradient {
-    background-image: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 400%;
-    background-position: 0%;
-  }
   .bankrupt {
     margin-bottom: 2rem;
     border: 1px solid rgba(var(--accent-light), 25%);
     background: linear-gradient(
-      rgba(var(--accent-dark), 66%),
+      rgba(var(--accent-dark), 96%),
       rgba(var(--accent-dark), 33%)
     );
     padding: 1.5rem;
@@ -102,4 +101,7 @@ import Card from "../components/Card.astro";
     gap: 2rem;
     padding: 0;
   }
+
+
+  /* 3D BUTTON */
 </style>
