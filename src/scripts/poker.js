@@ -126,12 +126,14 @@ document.querySelector('.play').addEventListener('click', startRound)
 document.querySelector('.redraw').addEventListener('click', dealRedraw)
 
 function startRound() {
+    toggleBettingButtons()
     let money = parseInt(sessionStorage.getItem('money'))
     if (money < 1 || bet > money) {
         alert("You do not have enough money to bet: " + bet);
         return;
     }
     let thisBet = bet * numHands
+    updateMoney(-thisBet)
     resetGame()
     const startingCards = []
     const splicedCards = shuffledCards.slice(0, cardsPerHand)
@@ -166,18 +168,18 @@ function dealRedraw() {
 
     dealHands(selectedCards, numHands)
     calculatePayout()
+    toggleBettingButtons()
     shuffleArray(shuffledCards)
 }
 
 function calculatePayout() {
-    const winningsDisplay = document.querySelector('.win-counter')
-    const bet = parseInt(document.querySelector('.bet-amount').textContent)
-
+    const winDisplay = document.querySelector('.win-counter')
     const cardsInPlay = getCards(1)
     const cardValuesInPlay = getCards(0)
     
     const payout = evaluateByRow(cardsInPlay, cardValuesInPlay)
-    winningsDisplay.textContent = payout * bet / 10
+    winDisplay.textContent = `$${payout * bet / 10}`
+    updateMoney(payout * bet / 10)
     // Calculate the payout based on the hand
     
 
@@ -198,9 +200,9 @@ function evaluateByRow(cardsInPlay, cardValuesInPlay) {
         if (winnings != null) {
             let winningHand = winnings[0]
             let winAmount = winnings[1]
-            totalWin += winnings[1]
+            totalWin += winAmount
             const winDisplay = document.createElement('div')
-            winDisplay.textContent = `${winnings[0]}: ${winnings[1] * betAmount / 10}`; // Display the ROWS winnings
+            winDisplay.textContent = `${winningHand}: ${winAmount * betAmount / 10}`; // Display the ROWS winnings
             winDisplay.classList.add('win-display'); 
             currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
         }
@@ -208,21 +210,16 @@ function evaluateByRow(cardsInPlay, cardValuesInPlay) {
     return totalWin
 }
 
-function updateMoney(increaseAmount) {
-    const money = parseInt(sessionStorage.getItem('money'))
-    sessionStorage.setItem('money', (money + increaseAmount).toString())
-    document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
-}
-// Gets hand in number form
+// Checks occurances of every card in the hand returns in form: {2: 1, 3: 2, 4: 1, K: 1}
 function countOccurrences(hand) {
-    const occurrences = {}; // {0 0 0 0 0}
+    const occurrences = {};
     for (const card of hand) {
         occurrences[card] = (occurrences[card] || 0) + 1; // Fill the occurance array with the number of times each card appears
     }
     return occurrences;
 } 
 
-// Looks at all the cards in hand returns the most valuable hand (4 of a kind, 3 of a kind, 2 pair, Jacks or better) 
+// Looks at all the cards in hand returns the most valuable hand. If no special hand, returns null
 function evaluateHand(cardsInPlay, sortedHand) {
     const handOccurrences = countOccurrences(sortedHand)
     let quadAces = 0
@@ -244,20 +241,24 @@ function evaluateHand(cardsInPlay, sortedHand) {
         // How many times each card appears in the hand
         const occurrences = handOccurrences[card];
         const cardValue = parseInt(card)
+        
+        // Can return these immediately to save time
+        if (occurrences === 4) {
+            if (card === "14") return getHandTuple("4 aces")
+            else if (card === "2" || card === "3" || card === "4") return getHandTuple("4 2s,3s,4s")
+            else return getHandTuple("4 5s thru Ks")
+        }
 
         // ROYAL
         if(!cardValue > 10) isRoyal = false;
         // FLUSH
 
         // 4 OF A KIND
-        if (occurrences === 4) {
-            if (card === "14") quadAces++;
-            else if (card === "2" || card === "3" || card === "4") quadLow++;
-            else quadHigh++;
-        }
+
         // 3 OF A KIND
         else if (occurrences === 3) threeOfAKind++;
-        // JACKS / 2 PAIR
+
+        // PAIRS
         else if (occurrences === 2) {
             if (card === "11" || card === "12" || card === "13" || card === "14") jackOrBetterPairs++;
             else lowPairs++;
@@ -265,10 +266,7 @@ function evaluateHand(cardsInPlay, sortedHand) {
     }
 
     if(isRoyal && isFlush && isStraight) return getHandTuple("royal");
-    if(quadAces > 0) return getHandTuple("4 aces");
     if(isStraight && isFlush) return getHandTuple("straight flush");
-    if(quadLow > 0) return getHandTuple("4 2s,3s,4s");
-    if(quadHigh > 0) return getHandTuple("4 5s thru Ks");
     if(threeOfAKind > 0 && (lowPairs > 0 || jackOrBetterPairs > 0)) return getHandTuple("full house");
     if(isFlush) return getHandTuple("flush");
     if(isStraight) return getHandTuple("straight");
@@ -277,6 +275,13 @@ function evaluateHand(cardsInPlay, sortedHand) {
     if(jackOrBetterPairs > 0) return getHandTuple("Jacks or better");
 
     return null;
+}
+
+// Update money and money display to go up by increaseAmount
+function updateMoney(increaseAmount) {
+    const money = parseInt(sessionStorage.getItem('money'))
+    sessionStorage.setItem('money', (money + increaseAmount).toString())
+    document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
 }
 
 function checkFlush(cardsInPlay) {
@@ -297,6 +302,7 @@ function checkStraight(sortedHand) {
     return true
 }
 
+// Toggle whether the user can select cards to keep
 function setUserCanSelectCards(canCurrentlySelect) {
     const firstRowCards = document.querySelectorAll('.row-1 img')
     if (canCurrentlySelect) {
@@ -316,11 +322,20 @@ function resetGame() {
     canSelectCards = false
 }
 
+// Toggle whether the draw or redraw button is visible
 const toggleDrawRedraw = () => {
     const drawButton = document.querySelector('.play')
     const redrawButton = document.querySelector('.redraw')
     drawButton.classList.toggle('hide')
     redrawButton.classList.toggle('hide')
+}
+
+// Toggles the betting buttons (bet and hands) so user cant change after hand is revealed
+function toggleBettingButtons() {
+    const betButton = document.querySelector('.bet')
+    const handsButton = document.querySelector('.hands')
+    betButton.disabled = !betButton.disabled;
+    handsButton.disabled = !handsButton.disabled;
 }
 
 // Allow user to change number of hands
