@@ -102,7 +102,6 @@ function getKeptCols(keptCards) {
         const cardCol = cardId.split('-')[2]
         keptCols.push(cardCol)
     }
-    console.log(keptCols)
     return keptCols
 }
 
@@ -217,18 +216,18 @@ function toggleBetAmount() {
     betAmountElement.innerHTML = betAmount;
 }
 
-function getCardsFromContainer(verbosity = 1) { 
-    const cardsInPlay = cardsContainer.querySelectorAll('img') // The ALT of the image is the card name e.g. "2_of_clubs"
+// Given a card img, return the card's alt attribute (full name) or numeric value (11,12,13,14 -> J,Q,K,A)
+function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) { 
     let cardValues = []
     if(verbosity === 1) { // Return cards as their alt attribute (name and suit)
-        for(let card of cardsInPlay) {
+        for(let card of cards) {
             cardValues.push(card.alt)
         }
         return cardValues
     }
 
     else if(verbosity === 0) { // Return cards as their number value
-        for(let card of cardsInPlay) {
+        for(let card of cards) {
             let cardValue = card.alt.split('_')[0] // Get the card name from the alt attribute
             if(cardValue === "jack") cardValue = "11"
             else if (cardValue === "queen") cardValue = "12"
@@ -245,26 +244,35 @@ function calculatePayout(hands, keptCards) {
     const money = sessionStorage.getItem('money')
     const payout = 0
     console.log("money: ", money, "bet: ", bet)
-    const cardsInPlay = getCardsFromContainer(1)
-    const cardValuesInPlay = getCardsFromContainer(0)
+    const cardsInPlay = getCards(1)
+    const cardValuesInPlay = getCards(0)
     console.log(cardsInPlay)
     
-    evaluateByRow(cardsInPlay, cardValuesInPlay)
+    let totalWin = evaluateByRow(cardsInPlay, cardValuesInPlay)
     // Calculate the payout based on the hand
     return payout;
 }
 
 // checks for pairs, full house and 4 of a kind. 
 function evaluateByRow(cardsInPlay, cardValuesInPlay) {
-    console.log("Numeric:" + cardValuesInPlay)
     const rows = cardValuesInPlay.length / cardsPerHand;
+    let totalWin = 0;
     for(let i = 0; i < rows; i++) {
+        const currentRow = document.getElementById(`row-${i+1}`)
         const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
-        const handOccurances = countOccurrences(sortedHand)
-        const winnings = evaluateHand(handOccurances, cardsInPlay, sortedHand)
-        console.log("row " + parseInt(i+1) + " win: " + winnings)
+        const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
+        const winnings = evaluateHand(handCards, sortedHand)
+        
+        totalWin += winnings
+        console.log("Winnings: ", winnings)
+        if (winnings > 0) {
+            const winDisplay = document.createElement('div');
+            winDisplay.textContent = `Win: ${winnings}`;
+            winDisplay.classList.add('win-display'); // You can style this class in your CSS
+            currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling);
+        }
     }
-    return 0
+    return totalWin
 }
 
 // Gets hand in number form
@@ -274,11 +282,11 @@ function countOccurrences(hand) {
         occurrences[card] = (occurrences[card] || 0) + 1; // Fill the occurance array with the number of times each card appears
     }
     return occurrences;
-}
+} 
 
 // Looks at all the cards in hand returns the most valuable hand (4 of a kind, 3 of a kind, 2 pair, Jacks or better) 
-function evaluateHand(handOccurrences, cardsInPlay, sortedHand) {
-    // NOT DETECTING STRAIGHT/FLUSH... FIX!
+function evaluateHand(cardsInPlay, sortedHand) {
+    const handOccurrences = countOccurrences(sortedHand)
     let quadAces = 0
     let quadLow = 0 // 2's 3's & 4's ONLY
     let quadHigh = 0 // 5's thru Kings
@@ -288,6 +296,7 @@ function evaluateHand(handOccurrences, cardsInPlay, sortedHand) {
 
     let isRoyal = true
 
+    // Check Straight/Flush
     const isFlush = checkFlush(cardsInPlay)
     const isStraight = checkStraight(sortedHand)
 
@@ -334,18 +343,20 @@ function evaluateHand(handOccurrences, cardsInPlay, sortedHand) {
 
 function checkFlush(cardsInPlay) {
     const suits = cardsInPlay.map(card => card.split('_')[2]) // Get the suits from the card filenames
+    console.log("suits:" + suits)
     const flush = suits.every(suit => suit === suits[0]) // If all suits are the same, return true, else false
-    console.log("flush?" + flush)
     return flush
 }
 
 function checkStraight(sortedHand) {
-    const isStraight = sortedHand.every((card, index, hand) => {
-        if (index === 0) return true
-        return card === hand[index - 1] + 1
-    })
-    console.log("straight?" + isStraight)
-    return isStraight
+    let lastCardNum = 0
+    for (let cardNum of sortedHand) {
+        console.log("CardNum: " + cardNum)
+        if (lastCardNum === 0) lastCardNum = cardNum
+        else if (cardNum !== lastCardNum + 1) return false
+        lastCardNum = cardNum
+    }
+    return true
 }
 
 function getSuitFromCard(card) {

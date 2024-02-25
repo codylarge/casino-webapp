@@ -86,6 +86,18 @@ const { title } = Astro.props;
       font-family: "Pridi", serif;
       font-weight: bold;
     }
+
+    .win-display {
+    position: absolute; /* Position absolutely */
+    top: 50%; /* Position it vertically in the middle of the parent container */
+    left: 50%; /* Position it horizontally in the middle of the parent container */
+    transform: translate(-50%, -50%); /* Center it exactly */
+    background-color: #f0f0f0; /* Example background color */
+    padding: 5px 10px; /* Adjust padding as needed */
+    border: 1px solid #ccc; /* Example border */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 999; /* Ensure it's on top of other elements */
+}
   </style>
 
 
