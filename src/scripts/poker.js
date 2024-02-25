@@ -130,6 +130,7 @@ function startRound() {
     let money = parseInt(sessionStorage.getItem('money'))
     if (money < 1 || bet * numHands > money) {
         alert("You do not have enough money to bet: " + bet);
+        resetGame()
         return;
     }
     let thisBet = bet * numHands
@@ -320,6 +321,8 @@ function resetGame() {
     selectedCards.length = 0
     
     canSelectCards = false
+
+    toggleBettingButtons()
 }
 
 // Toggle whether the draw or redraw button is visible
