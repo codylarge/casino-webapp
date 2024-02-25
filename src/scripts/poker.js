@@ -131,7 +131,7 @@ function startRound() {
         alert("You do not have enough money to bet: " + bet);
         return;
     }
-    thisBet = bet * numHands
+    let thisBet = bet * numHands
     resetGame()
     const startingCards = []
     const splicedCards = shuffledCards.slice(0, cardsPerHand)
