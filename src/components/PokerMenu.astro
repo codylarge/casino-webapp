@@ -32,12 +32,12 @@
     font-size: 48px;
     text-transform: uppercase;
     font-weight: 700;
-    color: red;
+    color: #1e00ff;
     text-shadow: 
-        -1px -1px 0 #ffee00,  
-         1px -1px 0 #ffee00,
-        -1px  1px 0 #ffee00,
-         1px  1px 0 #ffee00; /* Text outline */
+        -1px -1px 0 #fff,  
+         1px -1px 0 #fff,
+        -1px  1px 0 #fff,
+         1px  1px 0 #fff; /* Text outline */
     padding: 13px 19px;
     vertical-align: middle;
   }
@@ -51,68 +51,33 @@
   }
 
 button {
- appearance: button;
- background-color: #008bcc;
- border: solid transparent;
- border-radius: 16px;
- border-width: 0 0 4px;
- box-sizing: border-box;
- color: #FFFFFF;
- cursor: pointer;
- display: inline-block;
- font-size: 15px;
- font-weight: 700;
- letter-spacing: .8px;
- line-height: 20px;
- margin: 0;
- outline: none;
- overflow: visible;
- padding: 13px 19px;
- text-align: center;
- text-transform: uppercase;
- touch-action: manipulation;
- transform: translateZ(0);
- transition: filter .2s;
- user-select: none;
- -webkit-user-select: none;
- vertical-align: middle;
- white-space: nowrap;
- width:150px;
-}
-
-button:after {
- background-clip: padding-box;
- background-color: #1CB0F6;
- border: solid transparent;
- border-radius: 16px;
- border-width: 0 0 4px;
- bottom: -4px;
- content: "";
- left: 0;
- position: absolute;
- right: 0;
- top: 0;
- z-index: -1;
-}
-
-button:main, button:focus {
- user-select: auto;
-}
-
-button:hover:not(:disabled) {
- filter: brightness(1.1);
-}
-
-button:disabled {
- cursor: auto;
-}
-
-button:active:after {
- border-width: 0 0 0px;
+  border: none;
+  outline: none;
+  background-color: #0084ff;
+  padding: 15px;
+  width: 10%;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 5px;
+  transition: all ease 0.1s;
+  box-shadow: 0px 5px 0px 0px #8ac6ff;
 }
 
 button:active {
- padding-bottom: 10px;
+  transform: translateY(5px);
+  box-shadow: 0px 0px 0px 0px #8ac6ff;
 }
 
+@media screen and (max-width: 600px) {
+
+  button {
+    width: 20%;
+}
+
+.speed {
+  display: none;
+}
+
+}
 </style>
