@@ -33,6 +33,7 @@ const cardsPerHand = 5; // Number of cards per hand
 let bet = 10; // Default bet amount
 let canSelectCards = false; // Whether the user can select cards to keep
 let numHands = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
+
 // Function to generate image paths for each card
 function generateCardImagePaths(cards) {
     const cardImages = {}
@@ -71,6 +72,7 @@ function initializeCards(cards, rowNumber, keptCols) {
         rowDiv.appendChild(img)
         cardNumber++
     });
+    
     return rowDiv;
 }
 
@@ -126,16 +128,15 @@ document.querySelector('.play').addEventListener('click', startRound)
 document.querySelector('.redraw').addEventListener('click', dealRedraw)
 
 function startRound() {
-    toggleBettingButtons()
     let money = parseInt(sessionStorage.getItem('money'))
     if (money < 1 || bet * numHands > money) {
         alert("You do not have enough money to bet: " + bet);
         resetGame()
         return;
     }
+    resetGame()
     let thisBet = bet * numHands
     updateMoney(-thisBet)
-    resetGame()
     const startingCards = []
     const splicedCards = shuffledCards.slice(0, cardsPerHand)
     const hand = shuffledCards.splice(0, cardsPerHand)
@@ -170,7 +171,6 @@ function dealRedraw() {
     dealHands(selectedCards, numHands)
     calculatePayout()
     toggleBettingButtons()
-    shuffleArray(shuffledCards)
 }
 
 function calculatePayout() {
@@ -182,8 +182,6 @@ function calculatePayout() {
     winDisplay.textContent = `$${payout * bet / 10}`
     updateMoney(payout * bet / 10)
     // Calculate the payout based on the hand
-    
-
 }
 
 // checks for pairs, full house and 4 of a kind. 
@@ -223,9 +221,6 @@ function countOccurrences(hand) {
 // Looks at all the cards in hand returns the most valuable hand. If no special hand, returns null
 function evaluateHand(cardsInPlay, sortedHand) {
     const handOccurrences = countOccurrences(sortedHand)
-    let quadAces = 0
-    let quadLow = 0 // 2's 3's & 4's ONLY
-    let quadHigh = 0 // 5's thru Kings
     let threeOfAKind = 0
     let lowPairs = 0
     let jackOrBetterPairs = 0
