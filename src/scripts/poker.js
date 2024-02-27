@@ -72,7 +72,7 @@ function initializeCards(cards, rowNumber, keptCols) {
         rowDiv.appendChild(img)
         cardNumber++
     });
-    
+
     return rowDiv;
 }
 
@@ -103,7 +103,7 @@ function dealHands(selectedCards, rows) {
 
         currentIndex += rowCardsCount
         currentRow++
-        
+
         // Add 2 line breaks after each row
         for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'))
     }
@@ -166,43 +166,42 @@ function dealRedraw() {
         const startIndex = i * cardsPerHand
         const hand = shuffledCards.slice(startIndex, startIndex + cardsPerHand)
         selectedCards.push(...hand)
+        dealHands(selectedCards, numHands)
+        calculatePayout(hand)
     }
-
-    dealHands(selectedCards, numHands)
-    calculatePayout()
     toggleBettingButtons()
 }
 
-function calculatePayout() {
+function calculatePayout(hand) {
     const winDisplay = document.querySelector('.win-counter')
-    const cardsInPlay = getCards(1)
-    const cardValuesInPlay = getCards(0)
-    
-    const payout = evaluateByRow(cardsInPlay, cardValuesInPlay)
+
+    const payout = evaluateByRow(hand)
     winDisplay.textContent = `$${payout * bet / 10}`
     updateMoney(payout * bet / 10)
     // Calculate the payout based on the hand
 }
 
 // checks for pairs, full house and 4 of a kind. 
-function evaluateByRow(cardsInPlay, cardValuesInPlay) {
+function evaluateByRow(hand) {
+    const cardValuesInPlay = getCards(0, hand) // Card values in hand
+    console.log("cardValuesInPlay: " + cardValuesInPlay)
     const rows = cardValuesInPlay.length / cardsPerHand;
-    const betAmount = parseInt(document.querySelector('.bet-amount').textContent)
+    const betAmount = bet
     let totalWin = 0;
 
-    for(let i = 0; i < rows; i++) {
-        const currentRow = document.getElementById(`row-${i+1}`)
+    for (let i = 0; i < rows; i++) {
+        const currentRow = document.getElementById(`row-${i + 1}`)
         const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
         const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
         const winnings = evaluateHand(handCards, sortedHand)
-        
+
         if (winnings != null) {
             let winningHand = winnings[0]
             let winAmount = winnings[1]
             totalWin += winAmount
             const winDisplay = document.createElement('div')
             winDisplay.textContent = `${winningHand}: ${winAmount * betAmount / 10}`; // Display the ROWS winnings
-            winDisplay.classList.add('win-display'); 
+            winDisplay.classList.add('win-display');
             currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
         }
     }
@@ -216,7 +215,7 @@ function countOccurrences(hand) {
         occurrences[card] = (occurrences[card] || 0) + 1; // Fill the occurance array with the number of times each card appears
     }
     return occurrences;
-} 
+}
 
 // Looks at all the cards in hand returns the most valuable hand. If no special hand, returns null
 function evaluateHand(cardsInPlay, sortedHand) {
@@ -232,12 +231,11 @@ function evaluateHand(cardsInPlay, sortedHand) {
     const isStraight = checkStraight(sortedHand)
 
     // Check for 4 of a kind, 3 of a kind, 2 pair, and Jacks or better
-    for (const card in handOccurrences) 
-    {
+    for (const card in handOccurrences) {
         // How many times each card appears in the hand
         const occurrences = handOccurrences[card];
         const cardValue = parseInt(card)
-        
+
         // Can return these immediately to save time
         if (occurrences === 4) {
             if (card === "14") return getHandTuple("4 aces")
@@ -246,7 +244,7 @@ function evaluateHand(cardsInPlay, sortedHand) {
         }
 
         // ROYAL
-        if(!cardValue > 10) isRoyal = false;
+        if (!cardValue > 10) isRoyal = false;
         // FLUSH
 
         // 4 OF A KIND
@@ -258,17 +256,17 @@ function evaluateHand(cardsInPlay, sortedHand) {
         else if (occurrences === 2) {
             if (card === "11" || card === "12" || card === "13" || card === "14") jackOrBetterPairs++;
             else lowPairs++;
-        } 
+        }
     }
 
-    if(isRoyal && isFlush && isStraight) return getHandTuple("royal");
-    if(isStraight && isFlush) return getHandTuple("straight flush");
-    if(threeOfAKind > 0 && (lowPairs > 0 || jackOrBetterPairs > 0)) return getHandTuple("full house");
-    if(isFlush) return getHandTuple("flush");
-    if(isStraight) return getHandTuple("straight");
-    if(threeOfAKind > 0) return getHandTuple("3 of a kind");
-    if(lowPairs > 1 || jackOrBetterPairs > 1 || (lowPairs > 0 && jackOrBetterPairs > 0)) return getHandTuple("2 pairs");
-    if(jackOrBetterPairs > 0) return getHandTuple("Jacks or better");
+    if (isRoyal && isFlush && isStraight) return getHandTuple("royal");
+    if (isStraight && isFlush) return getHandTuple("straight flush");
+    if (threeOfAKind > 0 && (lowPairs > 0 || jackOrBetterPairs > 0)) return getHandTuple("full house");
+    if (isFlush) return getHandTuple("flush");
+    if (isStraight) return getHandTuple("straight");
+    if (threeOfAKind > 0) return getHandTuple("3 of a kind");
+    if (lowPairs > 1 || jackOrBetterPairs > 1 || (lowPairs > 0 && jackOrBetterPairs > 0)) return getHandTuple("2 pairs");
+    if (jackOrBetterPairs > 0) return getHandTuple("Jacks or better");
 
     return null;
 }
@@ -312,9 +310,9 @@ function setUserCanSelectCards(canCurrentlySelect) {
 
 function resetGame() {
     cardsContainer.innerHTML = ''
-    
+
     selectedCards.length = 0
-    
+
     canSelectCards = false
 
     toggleBettingButtons()
@@ -369,25 +367,26 @@ function toggleBetAmount() {
             bet = bet * 2
             break;
         default: // 1000
-        bet = 10
+            bet = 10
     }
     betAmountElement.innerHTML = bet;
 }
 
 // Given a card img, return the card's alt attribute (full name) or numeric value (11,12,13,14 -> J,Q,K,A)
-function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) { 
+function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) {
+    console.log("cards log:" + cards)
     let cardValues = []
-    if(verbosity === 1) { // Return cards as their alt attribute (name and suit)
-        for(let card of cards) {
+    if (verbosity === 1) { // Return cards as their alt attribute (name and suit)
+        for (let card of cards) {
             cardValues.push(card.alt)
         }
         return cardValues
     }
 
-    else if(verbosity === 0) { // Return cards as their number value
-        for(let card of cards) {
-            let cardValue = card.alt.split('_')[0] // Get the card name from the alt attribute
-            if(cardValue === "jack") cardValue = "11"
+    else if (verbosity === 0) { // Return cards as their number value
+        for (let card of cards) {
+            let cardValue = card.split('_')[0]
+            if (cardValue === "jack") cardValue = "11"
             else if (cardValue === "queen") cardValue = "12"
             else if (cardValue === "king") cardValue = "13"
             else if (cardValue === "ace") cardValue = "14"
