@@ -131,6 +131,7 @@ function startRound() {
     let money = parseInt(sessionStorage.getItem('money'))
     if (money < 1 || bet * numHands > money) {
         alert("You do not have enough money to bet: " + bet);
+        toggleBettingButtons()
         resetGame()
         return;
     }
@@ -166,9 +167,11 @@ function dealRedraw() {
         const startIndex = i * cardsPerHand
         const hand = shuffledCards.slice(startIndex, startIndex + cardsPerHand)
         selectedCards.push(...hand)
+        let payout = calculatePayout(hand)
+        console.log("payout:" + payout)
         dealHands(selectedCards, numHands)
-        calculatePayout(hand)
     }
+
     toggleBettingButtons()
 }
 
@@ -176,6 +179,8 @@ function calculatePayout(hand) {
     const winDisplay = document.querySelector('.win-counter')
 
     const HandWin = evaluateHand(hand)
+    return HandWin;
+
     winDisplay.textContent = `$${HandWin * bet / 10}`
     updateMoney(HandWin * bet / 10)
     // Calculate the payout based on the hand
@@ -185,7 +190,6 @@ function calculatePayout(hand) {
 function evaluateByRow(hand) {
     const cardValuesInPlay = getCards(0, hand) // Card values in hand
     const handCards = hand
-    console.log("cardValuesInPlay: " + cardValuesInPlay)
     const betAmount = bet
     let totalWin = 0;
 
@@ -193,6 +197,7 @@ function evaluateByRow(hand) {
     //const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
     //const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
     const winnings = evaluateHand(handCards, sortedHand)
+    console.log("winnings: " + winnings)
 
     if (winnings != null) {
         let winningHand = winnings[0]
@@ -217,14 +222,16 @@ function countOccurrences(hand) {
 
 // Looks at all the cards in hand returns the most valuable hand. If no special hand, returns null
 function evaluateHand(hand) {
+    const sortedHand = getCards(0, hand)
     const handOccurrences = countOccurrences(sortedHand)
+    console.log("hand" + hand)
     let threeOfAKind = 0
     let lowPairs = 0
     let jackOrBetterPairs = 0
     let isRoyal = true
 
     // Check Straight/Flush
-    const isFlush = checkFlush(cardsInPlay)
+    const isFlush = checkFlush(hand)
     const isStraight = checkStraight(sortedHand)
 
     // Check for 4 of a kind, 3 of a kind, 2 pair, and Jacks or better
@@ -386,6 +393,7 @@ function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img'))
             else if (cardValue === "ace") cardValue = "14"
             cardValues.push(parseInt(cardValue))
         }
+        cardValues.sort((a, b) => a - b);
         return cardValues
     }
 }
