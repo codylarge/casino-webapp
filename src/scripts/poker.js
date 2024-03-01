@@ -175,35 +175,33 @@ function dealRedraw() {
 function calculatePayout(hand) {
     const winDisplay = document.querySelector('.win-counter')
 
-    const payout = evaluateByRow(hand)
-    winDisplay.textContent = `$${payout * bet / 10}`
-    updateMoney(payout * bet / 10)
+    const HandWin = evaluateHand(hand)
+    winDisplay.textContent = `$${HandWin * bet / 10}`
+    updateMoney(HandWin * bet / 10)
     // Calculate the payout based on the hand
 }
 
 // checks for pairs, full house and 4 of a kind. 
 function evaluateByRow(hand) {
     const cardValuesInPlay = getCards(0, hand) // Card values in hand
+    const handCards = hand
     console.log("cardValuesInPlay: " + cardValuesInPlay)
-    const rows = cardValuesInPlay.length / cardsPerHand;
     const betAmount = bet
     let totalWin = 0;
 
-    for (let i = 0; i < rows; i++) {
-        const currentRow = document.getElementById(`row-${i + 1}`)
-        const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
-        const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
-        const winnings = evaluateHand(handCards, sortedHand)
+    //const currentRow = document.getElementById(`row-${i + 1}`)
+    //const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
+    //const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
+    const winnings = evaluateHand(handCards, sortedHand)
 
-        if (winnings != null) {
-            let winningHand = winnings[0]
-            let winAmount = winnings[1]
-            totalWin += winAmount
-            const winDisplay = document.createElement('div')
-            winDisplay.textContent = `${winningHand}: ${winAmount * betAmount / 10}`; // Display the ROWS winnings
-            winDisplay.classList.add('win-display');
-            currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
-        }
+    if (winnings != null) {
+        let winningHand = winnings[0]
+        let winAmount = winnings[1]
+        totalWin += winAmount
+        const winDisplay = document.createElement('div')
+        //winDisplay.textContent = `${winningHand}: ${winAmount * betAmount / 10}`; // Display the ROWS winnings
+        //winDisplay.classList.add('win-display');
+        currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
     }
     return totalWin
 }
@@ -218,12 +216,11 @@ function countOccurrences(hand) {
 }
 
 // Looks at all the cards in hand returns the most valuable hand. If no special hand, returns null
-function evaluateHand(cardsInPlay, sortedHand) {
+function evaluateHand(hand) {
     const handOccurrences = countOccurrences(sortedHand)
     let threeOfAKind = 0
     let lowPairs = 0
     let jackOrBetterPairs = 0
-
     let isRoyal = true
 
     // Check Straight/Flush
@@ -245,9 +242,6 @@ function evaluateHand(cardsInPlay, sortedHand) {
 
         // ROYAL
         if (!cardValue > 10) isRoyal = false;
-        // FLUSH
-
-        // 4 OF A KIND
 
         // 3 OF A KIND
         else if (occurrences === 3) threeOfAKind++;
