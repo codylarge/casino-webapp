@@ -72,7 +72,6 @@ function dealRedraw() {
 
         dealHand(hand, i + 1)
     }
-    
     setGameState("end")
 }
 
