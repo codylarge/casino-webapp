@@ -63,6 +63,7 @@ function play() {
 // Make sure only either draw or redraw is visible
 function dealRedraw() {
     setKeptCards()
+    cardsContainer.innerHTML = ''
     // Take exactly as many cards as needed out of shuffled cards
     for (let i = 0; i < numHands; i++) {
         let hand = cardsInPlay.splice(i * cardsPerHand, cardsPerHand)
@@ -91,7 +92,6 @@ const cardsContainer = document.querySelector('.cards');
 // Generate and append the Hand
 function dealHand(hand, currentRow, start = false) {
     let currentIndex = 0; // current card in row
-    cardsContainer.innerHTML = ''
     
     //console.log("Hand: " + hand)
     if(!start) {
@@ -101,9 +101,7 @@ function dealHand(hand, currentRow, start = false) {
             }
         }
     }
-
     initializeCards(hand, currentRow);
-
     // Add 2 line break after each row
     for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'))
 }
