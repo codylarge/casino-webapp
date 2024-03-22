@@ -63,10 +63,14 @@ function play() {
 // Make sure only either draw or redraw is visible
 function dealRedraw() {
     setKeptCards()
+    console.log("Kept Cards: " + keptCards)
     cardsContainer.innerHTML = ''
     // Take exactly as many cards as needed out of shuffled cards
     for (let i = 0; i < numHands; i++) {
         let hand = cardsInPlay.splice(i * cardsPerHand, cardsPerHand)
+        for (let keptTuple of keptCards) {
+            hand[keptTuple[0]] = keptTuple[1]
+        }
         console.log("Hand: " + hand)
         let payout = calculatePayout(hand)
         console.log("payout:" + payout)
@@ -78,13 +82,9 @@ function dealRedraw() {
 
 // Returns if the given column is in the current keet list
 function keptColumn(column) {
-    let cardInColumn
-    if(typeof column === "string") 
-        cardInColumn = keptCards[parseInt(column)]
-    else 
-        cardInColumn = keptCards[column]
-    if (cardInColumn) 
-        return cardInColumn
+    for(let card in keptCards) {
+        if(keptCards[card][0] == column) return card
+    }
     return null
 }
 
@@ -94,13 +94,14 @@ function dealHand(hand, currentRow, start = false) {
     let currentIndex = 0; // current card in row
     
     //console.log("Hand: " + hand)
+    /*
     if(!start) {
         for (let i = 0; i < cardsPerHand; i++) {
             if(keptColumn((i))) {
                 hand[i] = keptCards[i]
             }
         }
-    }
+    } */
     initializeCards(hand, currentRow);
     // Add 2 line break after each row
     for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'))
@@ -190,7 +191,7 @@ function setKeptCards() {
     for (const card of keep) {
         const cardName = card.alt
         const cardCol = card.id.split('-')[2]
-        keptCards[cardCol - 1] = cardName;
+        keptCards.push([cardCol - 1, cardName]);
     }
 }
 
