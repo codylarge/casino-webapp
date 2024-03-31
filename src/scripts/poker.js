@@ -52,7 +52,6 @@ function play() {
     let deck = shuffleArray(cards)
     cardsInPlay = deck.slice(0, cardsPerHand * (numHands+1))
     let startingCards = cardsInPlay.splice(0, cardsPerHand)
-    
     canSelectCards = true // lazy toggle me sutothod CHANGE
 
     dealHand(startingCards, 1, true)
@@ -67,7 +66,8 @@ function dealRedraw() {
     cardsContainer.innerHTML = ''
     // Take exactly as many cards as needed out of shuffled cards
     for (let i = 0; i < numHands; i++) {
-        let hand = cardsInPlay.splice(i * cardsPerHand, cardsPerHand)
+        console.log("cardsInPlay before splice: " + cardsInPlay)
+        let hand = cardsInPlay.splice(0, cardsPerHand)
         for (let keptTuple of keptCards) {
             hand[keptTuple[0]] = keptTuple[1]
         }
@@ -310,8 +310,8 @@ function updateMoney(increaseAmount) {
     document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
 }
 
-function checkFlush(cardsInPlay) {
-    const suits = cardsInPlay.map(card => card.split('_')[2]) // Get the suits from the card filenames
+function checkFlush(hand) {
+    const suits = hand.map(card => card.split('_')[2]) // Get the suits from the card filenames
     const flush = suits.every(suit => suit === suits[0]) // If all suits are the same, return true, else false
     return flush
 }
