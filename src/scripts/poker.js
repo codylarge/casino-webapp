@@ -103,40 +103,48 @@ function keptColumn(column) {
 const cardsContainer = document.querySelector('.cards');
 // Generate and append the Hand
 function dealHand(hand, currentRow, payout) {
-    let currentIndex = 0; // current card in row
-
     initializeCards(hand, currentRow, payout);
-    // Add 2 line break after each row
-    for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'))
+    
+    // Add 2 line breaks after each row
+    for (let i = 0; i < 2; i++) {
+        const br = document.createElement('br');
+        document.createDocumentFragment().appendChild(br);
+    }
+
+    cardsContainer.appendChild(document.createDocumentFragment());
 }
 
 // Gives each card const its respective image path
 function initializeCards(cards, rowNumber, payout) {
     const rowDiv = document.createElement('div');
-    rowDiv.classList.add('row', `row-${rowNumber}`); // Assign a class for the row number
-    rowDiv.id = `row-${rowNumber}` // Assigning a unique ID to each row
+    rowDiv.classList.add('row', `row-${rowNumber}`);
+    rowDiv.id = `row-${rowNumber}`;
 
+    // Use fragment to append all cards at once and avoid reflow
+    const fragment = document.createDocumentFragment();
     let cardNumber = 1;
     cards.forEach(cardTitle => {
-        const img = document.createElement('img')
+        const img = document.createElement('img');
         if (keptColumn(cardNumber - 1)) {
-            img.classList.add('kept') // kept class represents a card of keep class AFTER player has redrawn
+            img.classList.add('kept');
         }
-        img.src = cardImages[cardTitle]
-        img.alt = cardTitle
-        img.classList.add('card', `row-${rowNumber}`) // Add classes for card and row
-        img.id = `card-${rowNumber}-${cardNumber}` // Assign an ID based on row and card number
-        rowDiv.appendChild(img)
-        cardNumber++
+        img.src = cardImages[cardTitle];
+        img.alt = cardTitle;
+        img.classList.add('card', `row-${rowNumber}`);
+        img.id = `card-${rowNumber}-${cardNumber}`;
+        fragment.appendChild(img);
+        cardNumber++;
     });
 
+    rowDiv.appendChild(fragment);
     cardsContainer.appendChild(rowDiv);
-    let payoutAmount = payout[1]
-    if(payoutAmount > 0) {
-        const winDisplay = document.createElement('div')
-        winDisplay.textContent = `${payout[0]}: ${payoutAmount}`; // Display the ROWS winnings
+
+    let payoutAmount = payout[1];
+    if (payoutAmount > 0) {
+        const winDisplay = document.createElement('div');
+        winDisplay.textContent = `${payout[0]}: ${payoutAmount}`;
         winDisplay.classList.add('win-display');
-        rowDiv.parentNode.insertBefore(winDisplay, rowDiv.nextSibling); // remove .nextSibling to display below row
+        rowDiv.parentNode.insertBefore(winDisplay, rowDiv.nextSibling);
     }
 }
 
