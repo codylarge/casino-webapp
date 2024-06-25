@@ -74,8 +74,9 @@ function dealRedraw() {
         console.log("Hand: " + hand)
         let payout = calculatePayout(hand)
         console.log("payout:" + payout)
-
-        dealHand(hand, i + 1)
+        console.log("amount:" + payout[1])
+        // Payout in form: [<Hand Name>, <WinAmount>]
+        dealHand(hand, i + 1, payout)
     }
     setGameState("end")
 }
@@ -90,25 +91,16 @@ function keptColumn(column) {
 
 const cardsContainer = document.querySelector('.cards');
 // Generate and append the Hand
-function dealHand(hand, currentRow, start = false) {
+function dealHand(hand, currentRow, payout) {
     let currentIndex = 0; // current card in row
-    
-    //console.log("Hand: " + hand)
-    /*
-    if(!start) {
-        for (let i = 0; i < cardsPerHand; i++) {
-            if(keptColumn((i))) {
-                hand[i] = keptCards[i]
-            }
-        }
-    } */
-    initializeCards(hand, currentRow);
+
+    initializeCards(hand, currentRow, payout);
     // Add 2 line break after each row
     for (let i = 0; i < 2; i++) cardsContainer.appendChild(document.createElement('br'))
 }
 
 // Gives each card const its respective image path
-function initializeCards(cards, rowNumber) {
+function initializeCards(cards, rowNumber, payout) {
     const rowDiv = document.createElement('div');
     rowDiv.classList.add('row', `row-${rowNumber}`); // Assign a class for the row number
     rowDiv.id = `row-${rowNumber}` // Assigning a unique ID to each row
@@ -119,7 +111,6 @@ function initializeCards(cards, rowNumber) {
         if (keptColumn(cardNumber - 1)) {
             img.classList.add('kept') // kept class represents a card of keep class AFTER player has redrawn
         }
-
         img.src = cardImages[cardTitle]
         img.alt = cardTitle
         img.classList.add('card', `row-${rowNumber}`) // Add classes for card and row
@@ -129,6 +120,13 @@ function initializeCards(cards, rowNumber) {
     });
 
     cardsContainer.appendChild(rowDiv);
+    let payoutAmount = payout[1]
+    if(payoutAmount > 0) {
+        const winDisplay = document.createElement('div')
+        winDisplay.textContent = `${payout[0]}: ${payoutAmount}`; // Display the ROWS winnings
+        winDisplay.classList.add('win-display');
+        rowDiv.parentNode.insertBefore(winDisplay, rowDiv.nextSibling); // remove .nextSibling to display below row
+    }
 }
 
 function clickCard() {
@@ -143,12 +141,14 @@ function setGameState(state) {
     const redrawButton = document.querySelector('.redraw')
     const cards = document.querySelectorAll('.card img')
     const firstRowCards = document.querySelectorAll('.row-1 img');
+    const winDisplay = document.querySelector('.win-counter')
 
     drawButton.classList.toggle('hide')
     redrawButton.classList.toggle('hide')
     switch (state) {
         case "start": // 
             console.log("GameStarted")
+            winDisplay.textContent = "$0"
             betButton.disabled = true;
             handsButton.disabled = true;
             for (const card of firstRowCards){
@@ -202,11 +202,16 @@ const selectedCards = []
 function calculatePayout(hand) {
     const winDisplay = document.querySelector('.win-counter')
 
-    const HandWin = evaluateHand(hand)
-    return HandWin;
+    const handWin = evaluateHand(hand)
 
-    winDisplay.textContent = `$${HandWin * bet / 10}`
-    updateMoney(HandWin * bet / 10)
+    let lastWinTotal = winDisplay.textContent.split('$')[1]
+    if (typeof lastWinTotal === "undefined") lastWinTotal = 0
+
+    let newWinTotal = parseInt(lastWinTotal) + handWin[1] * bet / 10
+    winDisplay.textContent = `${"$" + newWinTotal}`
+
+    updateMoney(handWin[1] * bet / 10)
+    return handWin;
     // Calculate the payout based on the hand
 }
 
@@ -237,9 +242,11 @@ function evaluateByRow(hand) {
 function checkMoney(bet) {
     let money = parseInt(sessionStorage.getItem('money'))
     if (money < 1 || money < bet) {
-        alert("You do not have enough to place this bet")
+        alert("You do not have enough money for this action")
         return false
     }
+
+    updateMoney(-bet)
     return true
 }
 
@@ -300,7 +307,7 @@ function evaluateHand(hand) {
     if (lowPairs > 1 || jackOrBetterPairs > 1 || (lowPairs > 0 && jackOrBetterPairs > 0)) return getHandTuple("2 pairs");
     if (jackOrBetterPairs > 0) return getHandTuple("Jacks or better");
 
-    return null;
+    return ["No win", 0];
 }
 
 // Update money and money display to go up by increaseAmount
