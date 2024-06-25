@@ -34,8 +34,10 @@ const cardsPerHand = 5; // Number of cards per hand
 let bet = parseInt(document.querySelector('.bet-amount').textContent); // Default bet amount
 let canSelectCards = false; // Whether the user can select cards to keep
 let numHands = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
+let speed = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
 let cardsInPlay = []
 let keptCards = [] // tuple containing kept row and the card of that row
+let handDelay = 1000 // Delay between each hand being dealt
 
 // Start game by clicking draw
 document.querySelector('.play').addEventListener('click', play)
@@ -45,7 +47,6 @@ function play() {
     resetGame()
 
     if(!checkMoney(bet * numHands)) {
-        play()
         return
     }
     
@@ -60,7 +61,7 @@ function play() {
 }
 
 // Make sure only either draw or redraw is visible
-function dealRedraw() {
+async function dealRedraw() {
     setKeptCards()
     console.log("Kept Cards: " + keptCards)
     cardsContainer.innerHTML = ''
@@ -77,9 +78,19 @@ function dealRedraw() {
         console.log("amount:" + payout[1])
         // Payout in form: [<Hand Name>, <WinAmount>]
         dealHand(hand, i + 1, payout)
+
+        await wait(10)
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+
+        await wait(handDelay)
     }
     setGameState("end")
 }
+
+
 
 // Returns if the given column is in the current keet list
 function keptColumn(column) {
@@ -142,6 +153,7 @@ function setGameState(state) {
     const cards = document.querySelectorAll('.card img')
     const firstRowCards = document.querySelectorAll('.row-1 img');
     const winDisplay = document.querySelector('.win-counter')
+    const speedButton = document.querySelector('.speed')
 
     drawButton.classList.toggle('hide')
     redrawButton.classList.toggle('hide')
@@ -151,6 +163,7 @@ function setGameState(state) {
             winDisplay.textContent = "$0"
             betButton.disabled = true;
             handsButton.disabled = true;
+            speedButton.disabled = true;
             for (const card of firstRowCards){
                 card.addEventListener('click', clickCard)
             }
@@ -160,6 +173,7 @@ function setGameState(state) {
             console.log("GameEnded")
             betButton.disabled = false;
             handsButton.disabled = false;
+            speedButton.disabled = false;
             for (const card of firstRowCards)
                 card.removeEventListener('click', clickCard)
             keptCards = []
@@ -213,30 +227,6 @@ function calculatePayout(hand) {
     updateMoney(handWin[1] * bet / 10)
     return handWin;
     // Calculate the payout based on the hand
-}
-
-// checks for pairs, full house and 4 of a kind. 
-function evaluateByRow(hand) {
-    const cardValuesInPlay = getCards(0, hand) // Card values in hand
-    const handCards = hand
-    const betAmount = bet
-    let totalWin = 0;
-
-    //const currentRow = document.getElementById(`row-${i + 1}`)
-    //const sortedHand = cardValuesInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand).sort((a, b) => a - b); // Get the sorted hand (5 cards)
-    //const handCards = cardsInPlay.slice(i * cardsPerHand, (i + 1) * cardsPerHand) // Cards in form of jack_of_diamonds etc
-    const winnings = evaluateHand(handCards, sortedHand)
-
-    if (winnings != null) {
-        let winningHand = winnings[0]
-        let winAmount = winnings[1]
-        totalWin += winAmount
-        const winDisplay = document.createElement('div')
-        //winDisplay.textContent = `${winningHand}: ${winAmount * betAmount / 10}`; // Display the ROWS winnings
-        //winDisplay.classList.add('win-display');
-        currentRow.parentNode.insertBefore(winDisplay, currentRow.nextSibling); // remove .nextSibling to display below row
-    }
-    return totalWin
 }
 
 function checkMoney(bet) {
@@ -376,6 +366,27 @@ function toggleBetAmount() {
     betAmountElement.innerHTML = bet;
 }
 
+document.querySelector('.speed').addEventListener('click', toggleSpeed)
+function toggleSpeed() {
+    const speedElement = document.querySelector('.speed')
+    let speed = speedElement.textContent
+    switch (speed) {
+        case "Speed >":
+            handDelay = 650
+            speed = "Speed >>"
+            break
+        case "Speed >>":
+            handDelay = 0
+            speed = "Speed >>>"
+            break
+        case "Speed >>>":
+            handDelay = 2000
+            speed = "Speed >"
+            break
+    }
+    speedElement.innerHTML = speed;
+}
+
 // Given a card img, return the card's alt attribute (full name) or numeric value (11,12,13,14 -> J,Q,K,A)
 function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img')) {
     let cardValues = []
@@ -411,4 +422,8 @@ function getHandTuple(handName) {
     } else {
         return null; // Should never happen but just in case
     }
+}
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
