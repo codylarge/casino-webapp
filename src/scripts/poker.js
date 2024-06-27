@@ -101,18 +101,6 @@ function keptColumn(column) {
 }
 
 const cardsContainer = document.querySelector('.cards');
-// Generate and append the Hand
-function dealHand(hand, currentRow, payout) {
-    initializeCards(hand, currentRow, payout);
-    
-    // Add 2 line breaks after each row
-    for (let i = 0; i < 2; i++) {
-        const br = document.createElement('br');
-        document.createDocumentFragment().appendChild(br);
-    }
-
-    cardsContainer.appendChild(document.createDocumentFragment());
-}
 
 // Gives each card const its respective image path
 function initializeCards(cards, rowNumber, payout) {
@@ -120,16 +108,14 @@ function initializeCards(cards, rowNumber, payout) {
     rowDiv.classList.add('row', `row-${rowNumber}`);
     rowDiv.id = `row-${rowNumber}`;
 
-    // Use fragment to append all cards at once and avoid reflow
     const fragment = document.createDocumentFragment();
     let cardNumber = 1;
+
     cards.forEach(cardTitle => {
-        const img = document.createElement('img');
+        const img = window.cardImages[cardTitle].cloneNode();
         if (keptColumn(cardNumber - 1)) {
             img.classList.add('kept');
         }
-        img.src = cardImages[cardTitle];
-        img.alt = cardTitle;
         img.classList.add('card', `row-${rowNumber}`);
         img.id = `card-${rowNumber}-${cardNumber}`;
         fragment.appendChild(img);
@@ -145,6 +131,16 @@ function initializeCards(cards, rowNumber, payout) {
         winDisplay.textContent = `${payout[0]}: ${payoutAmount}`;
         winDisplay.classList.add('win-display');
         rowDiv.parentNode.insertBefore(winDisplay, rowDiv.nextSibling);
+    }
+}
+
+// Example usage of initializeCards
+async function dealHand(hand, currentRow, payout) {
+    initializeCards(hand, currentRow, payout);
+
+    // Add 2 line breaks after each row
+    for (let i = 0; i < 2; i++) {
+        cardsContainer.appendChild(document.createElement('br'));
     }
 }
 
