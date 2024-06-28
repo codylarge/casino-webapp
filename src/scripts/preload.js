@@ -1,4 +1,5 @@
-// Define your card titles
+// This script preloads all the card images when the page is loaded to improve performance
+
 const cards = [
     "2_of_clubs", "2_of_diamonds", "2_of_hearts", "2_of_spades",
     "3_of_clubs", "3_of_diamonds", "3_of_hearts", "3_of_spades",
@@ -13,6 +14,7 @@ const cards = [
     "queen_of_clubs", "queen_of_diamonds", "queen_of_hearts", "queen_of_spades",
     "king_of_clubs", "king_of_diamonds", "king_of_hearts", "king_of_spades",
     "ace_of_clubs", "ace_of_diamonds", "ace_of_hearts", "ace_of_spades",
+    "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ];
 
 // Function to create img elements and store them in an object

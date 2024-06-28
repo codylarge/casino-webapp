@@ -13,9 +13,7 @@ const cards = [
     "king_of_clubs", "king_of_diamonds", "king_of_hearts", "king_of_spades",
     "ace_of_clubs", "ace_of_diamonds", "ace_of_hearts", "ace_of_spades",
 ];
-const covers = [
-    "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
-]
+
 const pokerHands = [
     { hand: "Royal flush", points: 10000 },
     { hand: "4 aces", points: 5000 },
@@ -63,7 +61,7 @@ function play() {
 // Make sure only either draw or redraw is visible
 async function dealRedraw() {
     setKeptCards()
-    console.log("Kept Cards: " + keptCards)
+    //console.log("Kept Cards: " + keptCards)
     cardsContainer.innerHTML = ''
     // Take exactly as many cards as needed out of shuffled cards
     for (let i = 0; i < numHands; i++) {
@@ -89,8 +87,6 @@ async function dealRedraw() {
     }
     setGameState("end")
 }
-
-
 
 // Returns if the given column is in the current keet list
 function keptColumn(column) {
@@ -134,7 +130,6 @@ function initializeCards(cards, rowNumber, payout) {
     }
 }
 
-// Example usage of initializeCards
 async function dealHand(hand, currentRow, payout) {
     initializeCards(hand, currentRow, payout);
 
@@ -158,12 +153,14 @@ function setGameState(state) {
     const firstRowCards = document.querySelectorAll('.row-1 img');
     const winDisplay = document.querySelector('.win-counter')
     const speedButton = document.querySelector('.speed')
-
+    const redrawInstructions = document.querySelector('.redraw-instruction')
+    
     drawButton.classList.toggle('hide')
     redrawButton.classList.toggle('hide')
     switch (state) {
         case "start": // 
             console.log("GameStarted")
+            redrawInstructions.style.display = 'block';
             winDisplay.textContent = "$0"
             betButton.disabled = true;
             handsButton.disabled = true;
@@ -175,6 +172,7 @@ function setGameState(state) {
 
         case "end":
             console.log("GameEnded")
+            redrawInstructions.style.display = 'none';
             betButton.disabled = false;
             handsButton.disabled = false;
             speedButton.disabled = false;

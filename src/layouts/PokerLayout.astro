@@ -47,6 +47,7 @@ const rightPointsTable = rightPoints
 ---
 
 <Layout title={title}>
+  <h3 class="redraw-instruction">Select cards to keep.</h3>
   <div class="container">
     <ul class="left-menu">
       <li>
@@ -71,6 +72,12 @@ const rightPointsTable = rightPoints
 <style>
   .cards {
     padding-top: 50px;
+  }
+
+  .redraw-instruction {
+    text-align: center;
+    color: white;
+    display: none;
   }
 
   .container {
