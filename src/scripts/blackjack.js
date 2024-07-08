@@ -1,3 +1,5 @@
+//hand = 0: Dealer
+//hand = 1: Player 1
 
 const cards = [
     "2_of_clubs", "2_of_diamonds", "2_of_hearts", "2_of_spades",
@@ -19,11 +21,31 @@ const cards = [
 const covers = [
     "cover_blue", "cover_red", //"cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
+const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
+const playerHandDocument = document.querySelector(".player-hand .cards-container");
 
+let playerCards = []
+let dealerCards = []
+let cover
+
+// CURRENT START GAME
 document.addEventListener('DOMContentLoaded', () => {
-    let cover = pickRandomCover();
+    document.querySelector('.play').addEventListener('click', startGame)
+    cover = pickRandomCover();
     dealCoverCards(2, cover);
 });
+
+function startGame() {
+    // REMOVE THE COVERS 
+    console.log("Starting game")
+    let deck = shuffleArray(cards)
+    let playerStartingCards = deck.splice(0, 2)
+    console.log("Player Cards" + playerStartingCards)
+    let dealerStartingCards = deck.splice(0, 2)
+    console.log("Dealer cards" + dealerStartingCards)
+
+    dealStartingCards(dealerStartingCards, playerStartingCards, cover)
+}
 
 function pickRandomCover() {
     return covers[Math.floor(Math.random() * covers.length)];
@@ -36,28 +58,41 @@ function dealCoverCards(numCards, coverTitle) {
     }
 }
 
-// hand: 0 = dealer, 1 = player 1
-function dealCard(hand, cardTitle) {
-    const playerOneHandDocument = document.querySelector(".player-hand .cards-container");
-    const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
-    let cardImage = window.cardImages[cardTitle].cloneNode();
 
-    if (hand === 0) {
-        console.log("Dealing to dealer");
-        dealerHandDocument.appendChild(cardImage);
-    } else {
-        console.log("Dealing to player 1");
-        playerOneHandDocument.appendChild(cardImage);
-    }
+function dealStartingCards(dCards, pCards, cover) {
+    console.log("Revealing dealer starting card")
+    dealCard(0, cover)
+    dealCard(0, dCards[0])
+    console.log("Revealing player starting cards")
+    dealCard(1, pCards[0])
+    dealCard(1, pCards[1])
 }
 
-function placeBets() {
-    let totalBet = getTotalBet();
-    let money = parseInt(sessionStorage.getItem("money"));
-    if (totalBet > money) {
-        alert("You do not have enough money to place that bet.");
-        return;
+// hand: 0 = dealer, 1 = player 1 | replace: true/false to replace card
+function dealCard(hand, cardTitle) {
+    console.log(cardTitle)
+    let cardImage = window.cardImages[cardTitle].cloneNode();
+    let handDocument = undefined
+    if (hand === 0) {
+        handDocument = dealerHandDocument
+        console.log("Dealing to dealer");
+        dealerCards += cardTitle
+    } else {
+        handDocument = playerHandDocument
+        console.log("Dealing to player 1");
+        playerCards += cardTitle
     }
-    sessionStorage.setItem("money", money - totalBet);
-    document.getElementById("money").innerText = sessionStorage.getItem("money");
+    // TODO: MAKE SURE IF ITS A COVER DONT ADD IT
+    handDocument.appendChild(cardImage);
+}
+
+
+
+// REUSED CODE:
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array
 }
