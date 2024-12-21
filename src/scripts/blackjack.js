@@ -15,7 +15,6 @@ const cards = [
     "queen_of_clubs", "queen_of_diamonds", "queen_of_hearts", "queen_of_spades",
     "king_of_clubs", "king_of_diamonds", "king_of_hearts", "king_of_spades",
     "ace_of_clubs", "ace_of_diamonds", "ace_of_hearts", "ace_of_spades",
-
 ];
 
 const covers = [
@@ -24,37 +23,90 @@ const covers = [
 const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
 const playerHandDocument = document.querySelector(".player-hand .cards-container");
 
+const playButton = document.getElementById('play')
+const hitButton = document.getElementById('hit')
+const standButton = document.getElementById('stand')
+
 let playerCards = []
 let dealerCards = []
-let cover
+
+let deck = []
+
+let cover // The back of the card design that will be used for the game
+
+let firstDeal = true;
 
 // CURRENT START GAME
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.play').addEventListener('click', startGame)
+    playButton.addEventListener('click', startGame)
+    hitButton.addEventListener('click', hit)
+    standButton.addEventListener('click', stand)
     cover = pickRandomCover();
     dealCoverCards(2, cover);
 });
 
 function startGame() {
     // REMOVE THE COVERS 
+    removeAllCards()
+    toggleGameButtons()
     console.log("Starting game")
-    let deck = shuffleArray(cards)
+    deck = shuffleArray(cards)
     let playerStartingCards = deck.splice(0, 2)
-    console.log("Player Cards" + playerStartingCards)
+    console.log("Player Cards: " + playerStartingCards)
     let dealerStartingCards = deck.splice(0, 2)
-    console.log("Dealer cards" + dealerStartingCards)
-
+    console.log("Dealer Cards: " + dealerStartingCards)
+    
     dealStartingCards(dealerStartingCards, playerStartingCards, cover)
 }
 
-function pickRandomCover() {
-    return covers[Math.floor(Math.random() * covers.length)];
+function hit() {
+    dealCard(1, deck.pop());
+    let playerTotal = getHandTotal(playerCards)
+    if (playerTotal > 21) {
+        console.log("Player busts")
+        playDealerHand()
+        toggleGameButtons()
+    }
 }
 
-function dealCoverCards(numCards, coverTitle) {
-    for (let i = 0; i < numCards; i++) {
-        dealCard(0, coverTitle);
-        dealCard(1, coverTitle);
+function stand() {
+    console.log("Player stands")
+    let playerTotal = getHandTotal(playerCards)
+    let dealerTotal = getHandTotal(dealerCards)
+    console.log("Player total: " + playerTotal)
+    console.log("Dealer total: " + dealerTotal)
+
+    playDealerHand()
+
+    if (dealerTotal > 21) {
+        console.log("Dealer busts")
+    } else if (dealerTotal > playerTotal) {
+        console.log("Dealer wins")
+    } else if (dealerTotal < playerTotal) {
+        console.log("Player wins")
+    } else {
+        console.log("Push")
+    }
+
+    toggleGameButtons()
+}
+
+function playDealerHand() {
+    // Reveal dealers face down card
+    let faceDownCard = dealerCards[0]
+    console.log("Revealing dealer's face down card: " + faceDownCard)
+    let cardImage = window.cardImages[faceDownCard].cloneNode();
+
+    dealerHandDocument.removeChild(dealerHandDocument.firstChild)
+    dealerHandDocument.insertBefore(cardImage, dealerHandDocument.firstChild);
+
+    //dealCard(0, faceDownCard)
+    let dealerTotal = getHandTotal(dealerCards)
+    while (dealerTotal < 17) {
+        dealerHandDocument
+        dealCard(0, deck.pop());
+        dealerTotal = getHandTotal(dealerCards)
+        console.log("Dealer total: " + dealerTotal)
     }
 }
 
@@ -68,25 +120,54 @@ function dealStartingCards(dCards, pCards, cover) {
     dealCard(1, pCards[1])
 }
 
-// hand: 0 = dealer, 1 = player 1 | replace: true/false to replace card
+function pickRandomCover() {
+    return covers[Math.floor(Math.random() * covers.length)];
+}
+
+function dealCoverCards(numCards, coverTitle) {
+    for (let i = 0; i < numCards; i++) {
+        dealCard(0, coverTitle);
+        dealCard(1, coverTitle);
+    }
+}
+
+// hand: 0 = dealer, 1 = player 1
 function dealCard(hand, cardTitle) {
     console.log(cardTitle)
+
     let cardImage = window.cardImages[cardTitle].cloneNode();
     let handDocument = undefined
     if (hand === 0) {
         handDocument = dealerHandDocument
         console.log("Dealing to dealer");
-        dealerCards += cardTitle
+        dealerCards.push(cardTitle)
     } else {
         handDocument = playerHandDocument
         console.log("Dealing to player 1");
-        playerCards += cardTitle
+        playerCards.push(cardTitle)
     }
     // TODO: MAKE SURE IF ITS A COVER DONT ADD IT
     handDocument.appendChild(cardImage);
 }
 
+function toggleGameButtons() {  
+    if(playButton.style.display === "none") {
+        playButton.style.display = "block";
+        hitButton.style.display = "none";
+        standButton.style.display = "none";
+    } else {
+        playButton.style.display = "none";
+        hitButton.style.display = "block";
+        standButton.style.display = "block";
+    }
+}
 
+function removeAllCards() {
+    dealerHandDocument.innerHTML = ""
+    playerHandDocument.innerHTML = ""
+    playerCards = []
+    dealerCards = []
+}
 
 // REUSED CODE:
 function shuffleArray(array) {
@@ -95,4 +176,21 @@ function shuffleArray(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array
+}
+
+function getHandTotal(cards) {
+    let cardValues = []
+
+    for (let card of cards) {
+        let cardValue = card.split('_')[0]
+        if (cardValue === "jack" || cardValue === "queen" || cardValue === "king") cardValue = 10
+        else if (cardValue === "ace") cardValue = 11
+        else if(cardValue === "cover") cardValue = 0
+        else cardValue = parseInt(cardValue)
+        cardValues.push(cardValue)
+    }
+
+    cardValues.sort((a, b) => a - b); // sort the array in ascending order
+    let sum = cardValues.reduce((a, b) => a + b, 0) // sum all the values in the array
+    return sum
 }

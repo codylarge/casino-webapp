@@ -14,7 +14,11 @@ const { title } = Astro.props;
         <h3 class="hand-title">Dealer's Hand:</h3>
         <div class="cards-container"></div>
       </div>
-      <button class="play">PLAY</button>
+      <div class="button-container">
+        <button id="play">PLAY</button>
+        <button id="hit" style="display: none">HIT</button>
+        <button id="stand" style="display: none">STAY</button>
+      </div>
       <div class="player-hand">
         <h3 class="hand-title">Your Hand:</h3>
         <div class="cards-container"></div>
@@ -58,6 +62,40 @@ const { title } = Astro.props;
       text-align: center;
       margin-bottom: 20px;
     }
+
+      /* Container styling */
+  .button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  /* Button styling */
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #007BFF;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  /* Button hover effect */
+  button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  /* Button active effect */
+  button:active {
+    background-color: #003f7f;
+    transform: scale(0.95);
+  }
   </style>
   <script src="../scripts/preload.js"></script>
   <script src="../scripts/blackjack.js"></script></Layout
