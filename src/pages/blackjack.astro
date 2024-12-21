@@ -11,7 +11,7 @@ const { title } = Astro.props;
   <div class="hands-container">
     <div class="hands-container">
       <div class="dealer-hand">
-        <h3 class="hand-title">Dealer's Hand:</h3>
+        <h3 id="dealer-total" class="hand-title">Dealer's Hand:</h3>
         <div class="cards-container"></div>
       </div>
       <div class="button-container">
@@ -20,7 +20,7 @@ const { title } = Astro.props;
         <button id="stand" style="display: none">STAY</button>
       </div>
       <div class="player-hand">
-        <h3 class="hand-title">Your Hand:</h3>
+        <h3 id="player-total" class="hand-title">Your Hand:</h3>
         <div class="cards-container"></div>
       </div>
     </div>
