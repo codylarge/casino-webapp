@@ -34,6 +34,10 @@ let dealerCards = []
 let dealerAces = 0 
 let playerAces = 0
 
+// Modifiers used to artificially change the dealer and player's hand values (for aces)
+let dealerModifier = 0
+let playerModifier = 0
+
 let deck = []
 
 let cover // The back of the card design that will be used for the game
@@ -51,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function startGame() {
     // REMOVE THE COVERS 
-    removeAllCards()
+    reset()
     toggleGameButtons()
     console.log("Starting game")
     deck = shuffleArray(cards)
@@ -65,11 +69,13 @@ function startGame() {
 
 function hit() {
     dealCard(1, deck.pop());
-    let playerTotal = getHandTotal(playerCards)
+    let playerTotal = getHandTotal(playerCards, 1)
     if (playerTotal > 21) {
-        console.log("Player busts")
-        playDealerHand()
-        toggleGameButtons()
+        if(confirmBust(1)) {
+            console.log("Player busts")
+            playDealerHand()
+            toggleGameButtons()
+        }
     }
 }
 
@@ -78,8 +84,8 @@ async function stand() {
 
     await playDealerHand();
 
-    let playerTotal = getHandTotal(playerCards)
-    let dealerTotal = getHandTotal(dealerCards)
+    let playerTotal = getHandTotal(playerCards, 1)
+    let dealerTotal = getHandTotal(dealerCards, 0)
 
     if (dealerTotal > 21) {
         console.log("Dealer busts")
@@ -102,7 +108,7 @@ async function playDealerHand() {
     dealerHandDocument.insertBefore(cardImage, dealerHandDocument.firstChild);
     dealerCards.push(faceDownCard)
     // Calculate dealer's total
-    let dealerTotal = getHandTotal(dealerCards);
+    let dealerTotal = getHandTotal(dealerCards, 0);
     updateHandTotal(0)
     // While the dealer's total is less than 17
     while (dealerTotal < 17) {
@@ -111,7 +117,8 @@ async function playDealerHand() {
 
         // Deal a new card and update the dealer's total
         dealCard(0, deck.pop());
-        dealerTotal = getHandTotal(dealerCards);
+        dealerTotal = getHandTotal(dealerCards, 0);
+        confirmBust(0)
     }
 }
 
@@ -186,7 +193,8 @@ function shuffleArray(array) {
     return array
 }
 
-function getHandTotal(cards) {
+// retrns the total value of a hand assuming aces are 11
+function getHandTotal(cards, player) {
     let cardValues = []
 
     for (let card of cards) {
@@ -200,29 +208,34 @@ function getHandTotal(cards) {
 
     cardValues.sort((a, b) => a - b); // sort the array in ascending order
     let sum = cardValues.reduce((a, b) => a + b, 0) // sum all the values in the array
+
+    if(player === 0) sum += dealerModifier
+    else if(player === 1) sum += playerModifier
+    
     return sum
 }
 
+// This method is only called AFTER the player specified has OVER 21 (without converting aces)
 // player: 0 = dealer, 1 = player 1
 function confirmBust(player) {
     let total = getHandTotal(player === 0 ? dealerCards : playerCards)
     let aces = player === 0 ? dealerAces : playerAces
-    
-    if(playerAces === 0 && dealerAces === 0) return true
-    
-    if(player === 0) {
-        if(dealerAces > 0 && total > 21) {
-            total -= 10
-            dealerAces--
-        }
-    } else if(player === 1) {
-        if(playerAces > 0 && total > 21) {
-            total -= 10
-            playerAces--
-        }
-    }
 
-    return false
+    if (total <= 21) return false // Not a bust
+    if(aces === 0) return true // No aces so confirmed bust
+    
+    if(aces > 0 && total > 21) {
+        if(player === 0) {
+            dealerModifier -= 10
+            dealerAces -= 1
+            updateHandTotal(0)
+        } else if (player === 1) {
+            playerModifier -= 10
+            playerAces -= 1
+            updateHandTotal(1)
+        }
+        return false
+    }
 }
 
 // Updates the total of a hand to be shown on the screen
@@ -232,15 +245,23 @@ function updateHandTotal(player) {
     if(player === 0) {
         totalDocument = document.getElementById("dealer-total")
         totalDocument.textContent = "Dealer Total:"
-        currentTotal = getHandTotal(dealerCards)
+        currentTotal = getHandTotal(dealerCards, 0)
     } else if (player === 1) {
         totalDocument = document.getElementById("player-total")
         totalDocument.textContent = "Player Total:"
-        currentTotal = getHandTotal(playerCards)    
+        currentTotal = getHandTotal(playerCards, 1)    
     }
     totalDocument.textContent += ` ${currentTotal}`;
 }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function reset(){
+    removeAllCards()
+    dealerAces = 0
+    playerAces = 0
+    dealerModifier = 0
+    playerModifier = 0
 }

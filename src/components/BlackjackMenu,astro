@@ -1,0 +1,91 @@
+---
+// This component handles the Blackjack menu with bets and a play button.
+---
+<div id="blackjack-menu" class="menu-container">
+  <h1>Big Money Blackjack</h1>
+  <div class="bet-container">
+    <div class="bet">
+      <label for="main-bet">Main Bet:</label>
+      <input type="number" id="main-bet" placeholder="Enter main bet" min="1" />
+    </div>
+    <div class="bet">
+      <label for="pair-bet">Pair Bet:</label>
+      <input type="number" id="pair-bet" placeholder="Enter pair bet" min="0" />
+    </div>
+    <div class="bet">
+      <label for="suited-pair-bet">Suited Pair Bet:</label>
+      <input type="number" id="suited-pair-bet" placeholder="Enter suited pair bet" min="0" />
+    </div>
+  </div>
+  <button id="play-menu-button">PLAY</button>
+
+  <style>
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: black;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: gold;
+    }
+
+    .bet-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .bet {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    label {
+      margin-bottom: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 2px solid #007BFF;
+      outline: none;
+      width: 200px;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border: 2px solid #007BFF;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      background-color: #003f7f;
+      transform: scale(0.95);
+    }
+  </style>
+</div>
