@@ -1,3 +1,4 @@
+
 //hand = 0: Dealer
 //hand = 1: Player 1
 
@@ -112,10 +113,8 @@ async function playDealerHand() {
     updateHandTotal(0)
     // While the dealer's total is less than 17
     while (dealerTotal < 17) {
-        // Wait before dealing the next card
-        await sleep(1000); // 1000ms = 1 second
+        await sleep(1000); // 1 second pause
 
-        // Deal a new card and update the dealer's total
         dealCard(0, deck.pop());
         dealerTotal = getHandTotal(dealerCards, 0);
         confirmBust(0)
@@ -215,7 +214,7 @@ function getHandTotal(cards, player) {
     return sum
 }
 
-// This method is only called AFTER the player specified has OVER 21 (without converting aces)
+// This method is called to check a bust in any situation (before or after 21 is exceeded)
 // player: 0 = dealer, 1 = player 1
 function confirmBust(player) {
     let total = getHandTotal(player === 0 ? dealerCards : playerCards)
