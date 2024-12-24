@@ -1,90 +1,77 @@
----
-// This component handles the Blackjack menu with bets and a play button.
----
-<div id="blackjack-menu" class="menu-container">
-  <h1>Big Money Blackjack</h1>
+
+<div class="footer-menu">
   <div class="bet-container">
-    <div class="bet">
-      <label for="main-bet">Main Bet:</label>
-      <input type="number" id="main-bet" placeholder="Enter main bet" min="1" />
-    </div>
-    <div class="bet">
+    <label for="main-bet"></label>
+    <input type="number" id="main-bet" min="0" placeholder="Main Bet">
+  </div>
+  <button id="side-bets-toggle">Side Bets</button>
+  <div class="side-bets-container" style="display: none;">
+    <div class="side-bet">
       <label for="pair-bet">Pair Bet:</label>
-      <input type="number" id="pair-bet" placeholder="Enter pair bet" min="0" />
+      <input type="number" id="pair-bet" min="0" placeholder="Pair">
     </div>
-    <div class="bet">
+    <div class="side-bet">
       <label for="suited-pair-bet">Suited Pair Bet:</label>
-      <input type="number" id="suited-pair-bet" placeholder="Enter suited pair bet" min="0" />
+      <input type="number" id="suited-pair-bet" min="0" placeholder="Suited Pair">
     </div>
   </div>
-  <button id="play-menu-button">PLAY</button>
-
-  <style>
-    .menu-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      color: white;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: gold;
-    }
-
-    .bet-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .bet {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    label {
-      margin-bottom: 5px;
-      font-size: 1rem;
-      font-weight: bold;
-    }
-
-    input {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 2px solid #007BFF;
-      outline: none;
-      width: 200px;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      border: 2px solid #007BFF;
-      border-radius: 5px;
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-      transform: scale(1.05);
-    }
-
-    button:active {
-      background-color: #003f7f;
-      transform: scale(0.95);
-    }
-  </style>
 </div>
+
+<style>
+  .footer-menu {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  color: white;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  gap: 15px;
+}
+
+.footer-menu .bet-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.footer-menu .side-bets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-menu label {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.footer-menu input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 120px;
+}
+
+.footer-menu button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007BFF;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.footer-menu button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+</style>
