@@ -9,15 +9,16 @@ const { title } = Astro.props;
 ---
 
 <Layout title={title}>
-  <BlackjackMenu id="blackjack-menu" />
-  <div class="hands-container">
+  <div id="betting-menu">
+    <BlackjackMenu  />
+  </div>
+  <div id="game-container" style="display: none">
     <div class="hands-container">
       <div class="dealer-hand">
         <h3 id="dealer-total" class="hand-title">Dealer's Hand:</h3>
         <div class="cards-container"></div>
       </div>
       <div class="button-container">
-        <button id="play">PLAY</button>
         <button id="hit" style="display: none">HIT</button>
         <button id="stand" style="display: none">STAY</button>
       </div>

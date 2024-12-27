@@ -1,0 +1,84 @@
+<div class="end-screen">
+    <h1>Game Over</h1>
+    <div class="results">
+      <h2>Player Wins:</h2>
+      <p id="player-wins">0</p>
+      <h2>Dealer Wins:</h2>
+      <p id="dealer-wins">0</p>
+    </div>
+    <div class="winnings">
+      <div class="winnings-item">
+        <span>Bet Winnings:</span>
+        <span id="bet-winnings">$0</span>
+      </div>
+      <div class="winnings-item">
+        <span>Side Bet Winnings:</span>
+        <span id="side-bet-winnings">$0</span>
+      </div>
+      <div class="winnings-item total">
+        <span>Total:</span>
+        <span id="total-winnings">$0</span>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    /* End screen container */
+    .end-screen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #333;
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      width: 400px;
+    }
+  
+    /* Title styling */
+    .end-screen h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+  
+    /* Results section */
+    .results h2 {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+  
+    .results p {
+      font-size: 18px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+  
+    /* Winnings section */
+    .winnings {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  
+    .winnings-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+  
+    .winnings-item.total {
+      font-weight: bold;
+      font-size: 20px;
+    }
+  
+    /* Responsive design */
+    @media (max-width: 500px) {
+      .end-screen {
+        width: 90%;
+      }
+    }
+  </style>
+  

@@ -29,10 +29,10 @@ const pokerHands = [
 ];
 
 const cardsPerHand = 5; // Number of cards per hand
-let bet = parseInt(document.querySelector('.bet-amount').textContent); // Default bet amount
+let bet = parseInt(document.querySelector('.bet-amount').textContent, 10); // Default bet amount
 let canSelectCards = false; // Whether the user can select cards to keep
-let numHands = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
-let speed = parseInt(document.querySelector('.num-hands').textContent) // Number of hands
+let numHands = parseInt(document.querySelector('.num-hands').textContent, 10) // Number of hands
+let speed = parseInt(document.querySelector('.num-hands').textContent, 10) // Number of hands
 let cardsInPlay = []
 let keptCards = [] // tuple containing kept row and the card of that row
 let handDelay = 1000 // Delay between each hand being dealt
@@ -223,7 +223,7 @@ function calculatePayout(hand) {
     let lastWinTotal = winDisplay.textContent.split('$')[1]
     if (typeof lastWinTotal === "undefined") lastWinTotal = 0
 
-    let newWinTotal = parseInt(lastWinTotal) + handWin[1] * bet / 10
+    let newWinTotal = parseInt(lastWinTotal, 10) + handWin[1] * bet / 10
     winDisplay.textContent = `${"$" + newWinTotal}`
 
     updateMoney(handWin[1] * bet / 10)
@@ -232,7 +232,7 @@ function calculatePayout(hand) {
 }
 
 function checkMoney(bet) {
-    let money = parseInt(sessionStorage.getItem('money'))
+    let money = parseInt(sessionStorage.getItem('money'), 10)
     if (money < 1 || money < bet) {
         alert("You do not have enough money for this action")
         return false
@@ -268,7 +268,7 @@ function evaluateHand(hand) {
     for (const card in handOccurrences) {
         // How many times each card appears in the hand
         const occurrences = handOccurrences[card];
-        const cardValue = parseInt(card)
+        const cardValue = parseInt(card, 10)
 
         // Can return these immediately to save time
         if (occurrences === 4) {
@@ -304,7 +304,7 @@ function evaluateHand(hand) {
 
 // Update money and money display to go up by increaseAmount
 function updateMoney(increaseAmount) {
-    const money = parseInt(sessionStorage.getItem('money'))
+    const money = parseInt(sessionStorage.getItem('money'), 10)
     sessionStorage.setItem('money', (money + increaseAmount).toString())
     document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
 }
@@ -353,7 +353,7 @@ function toggleNumHands() {
 document.querySelector('.bet').addEventListener('click', toggleBetAmount)
 function toggleBetAmount() {
     const betAmountElement = document.querySelector('.bet-amount')
-    let desiredBetAmount = parseInt(betAmountElement.textContent)
+    let desiredBetAmount = parseInt(betAmountElement.textContent, 10)
 
     switch (desiredBetAmount) {
         case 10: case 100:
@@ -406,7 +406,7 @@ function getCards(verbosity = 1, cards = cardsContainer.querySelectorAll('img'))
             else if (cardValue === "queen") cardValue = "12"
             else if (cardValue === "king") cardValue = "13"
             else if (cardValue === "ace") cardValue = "14"
-            cardValues.push(parseInt(cardValue))
+            cardValues.push(parseInt(cardValue, 10))
         }
         cardValues.sort((a, b) => a - b);
         return cardValues

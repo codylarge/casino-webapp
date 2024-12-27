@@ -1,7 +1,6 @@
 
 //hand = 0: Dealer
 //hand = 1: Player 1
-
 const cards = [
     "2_of_clubs", "2_of_diamonds", "2_of_hearts", "2_of_spades",
     "3_of_clubs", "3_of_diamonds", "3_of_hearts", "3_of_spades",
@@ -21,12 +20,17 @@ const cards = [
 const covers = [
     "cover_blue", "cover_red", //"cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
+
 const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
 const playerHandDocument = document.querySelector(".player-hand .cards-container");
 
-const playButton = document.getElementById('play')
+const playButton = document.getElementById('play-button')
 const hitButton = document.getElementById('hit')
 const standButton = document.getElementById('stand')
+
+const mainBet = document.getElementById("main-bet")
+const pairBet = document.getElementById("pair-bet")
+const suitedPairBet = document.getElementById("suited-pair-bet")
 
 let playerCards = []
 let dealerCards = []
@@ -51,21 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
     hitButton.addEventListener('click', hit)
     standButton.addEventListener('click', stand)
     cover = pickRandomCover();
-    dealCoverCards(2, cover);
 });
 
-function startGame() {
+
+async function startGame() {
+
+    let totalBet = parseInt(mainBet.value, 10) + parseInt(pairBet.value, 10) + parseInt(suitedPairBet.value, 10)
+
+    if (!checkMoney(totalBet)) {
+        return
+    }
     // REMOVE THE COVERS 
     reset()
-    toggleGameButtons()
+    setGameState(1)
     console.log("Starting game")
     deck = shuffleArray(cards)
     let playerStartingCards = deck.splice(0, 2)
     console.log("Player Cards: " + playerStartingCards)
     let dealerStartingCards = deck.splice(0, 2)
     console.log("Dealer Cards: " + dealerStartingCards)
-    
-    dealStartingCards(dealerStartingCards, playerStartingCards, cover)
+
+
+    console.log(`Main Bet: ${mainBet.value}, Pair Bet: ${pairBet}, Suited Pair Bet: ${suitedPairBet}`)
+    await dealStartingCards(dealerStartingCards, playerStartingCards, cover)
 }
 
 function hit() {
@@ -74,8 +86,7 @@ function hit() {
     if (playerTotal > 21) {
         if(confirmBust(1)) {
             console.log("Player busts")
-            playDealerHand()
-            toggleGameButtons()
+            stand()
         }
     }
 }
@@ -97,8 +108,8 @@ async function stand() {
     } else {
         console.log("Push")
     }
-
-    toggleGameButtons()
+    await endGame()
+    setGameState(0)
 }
 
 async function playDealerHand() {
@@ -122,13 +133,17 @@ async function playDealerHand() {
 }
 
 
-function dealStartingCards(dCards, pCards, cover) {
-    console.log("Revealing dealer starting card")
-    dealCard(0, cover)
-    dealCard(0, dCards[0])
-    console.log("Revealing player starting cards")
+async function dealStartingCards(dCards, pCards, cover) {
+    const dealTime = 500;
+
     dealCard(1, pCards[0])
+    await sleep(dealTime)
+    dealCard(0, cover)
+    await sleep(dealTime)
     dealCard(1, pCards[1])
+    await sleep(dealTime)
+    dealCard(0, dCards[0])
+    await sleep(dealTime)
 }
 
 function pickRandomCover() {
@@ -164,18 +179,6 @@ function dealCard(hand, cardTitle) {
     updateHandTotal(hand)
 }
 
-function toggleGameButtons() {  
-    if(playButton.style.display === "none") {
-        playButton.style.display = "block";
-        hitButton.style.display = "none";
-        standButton.style.display = "none";
-    } else {
-        playButton.style.display = "none";
-        hitButton.style.display = "block";
-        standButton.style.display = "block";
-    }
-}
-
 function removeAllCards() {
     dealerHandDocument.innerHTML = ""
     playerHandDocument.innerHTML = ""
@@ -201,7 +204,7 @@ function getHandTotal(cards, player) {
         if (cardValue === "jack" || cardValue === "queen" || cardValue === "king") cardValue = 10
         else if (cardValue === "ace") cardValue = 11
         else if(cardValue === "cover") cardValue = 0
-        else cardValue = parseInt(cardValue)
+        else cardValue = parseInt(cardValue, 10)
         cardValues.push(cardValue)
     }
 
@@ -257,10 +260,58 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// 0 = betting stage, 1 = playing stage
+function setGameState(state) {
+    const bettingMenu = document.getElementById("betting-menu");
+    const gameContainer = document.getElementById("game-container");
+
+    if (state === 0) {
+        bettingMenu.style.display = "block";
+        gameContainer.style.display = "none";
+        hitButton.style.display = "none";
+        standButton.style.display = "none";
+    } else if (state === 1) {
+        bettingMenu.style.display = "none";
+        gameContainer.style.display = "block";
+        hitButton.style.display = "block";
+        standButton.style.display = "block";
+    }
+}
+
+// 0 = dealer win, 1 = player 1 win
+async function endGame(results) {
+    if(results === 0) {
+        
+    }
+}
+
 function reset(){
     removeAllCards()
     dealerAces = 0
     playerAces = 0
     dealerModifier = 0
     playerModifier = 0
+}
+
+// Duplicate code from poker.js
+function checkMoney(bet) {
+    if (isNaN(bet)) {
+        alert("Please enter a valid number as a bet")
+        return false
+    }
+    
+    let money = parseInt(sessionStorage.getItem('money'), 10)
+    if (money < 1 || money < bet) {
+        alert("You do not have enough money for this action")
+        return false
+    }
+
+    updateMoney(-bet)
+    return true
+}
+
+function updateMoney(increaseAmount) {
+    const money = parseInt(sessionStorage.getItem('money'), 10)
+    sessionStorage.setItem('money', (money + increaseAmount).toString())
+    document.querySelector("#money").textContent = `$${sessionStorage.getItem("money")}`; // Changes #money from Nav component
 }

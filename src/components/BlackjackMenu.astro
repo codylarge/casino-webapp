@@ -1,77 +1,80 @@
-
-<div class="footer-menu">
+<div class="centered-menu">
+  <h1>Big Money Blackjack</h1>
   <div class="bet-container">
-    <label for="main-bet"></label>
-    <input type="number" id="main-bet" min="0" placeholder="Main Bet">
+    <label for="main-bet">Main Bet:</label>
+    <input type="number" id="main-bet" min="0" placeholder="Enter Main Bet" value="0">
   </div>
-  <button id="side-bets-toggle">Side Bets</button>
-  <div class="side-bets-container" style="display: none;">
+  <div class="side-bets-container">
     <div class="side-bet">
       <label for="pair-bet">Pair Bet:</label>
-      <input type="number" id="pair-bet" min="0" placeholder="Pair">
+      <input type="number" id="pair-bet" min="0" placeholder="Enter Pair Bet" value="0">
     </div>
     <div class="side-bet">
       <label for="suited-pair-bet">Suited Pair Bet:</label>
-      <input type="number" id="suited-pair-bet" min="0" placeholder="Suited Pair">
+      <input type="number" id="suited-pair-bet" min="0" placeholder="Enter Suited Pair Bet" value="0">
     </div>
   </div>
+  <button id="play-button">Play</button>
 </div>
 
 <style>
-  .footer-menu {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 0;
-  color: white;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
-  gap: 15px;
-}
+  /* Center the menu on the screen */
+  .centered-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    width: 300px;
+    text-align: center;
+  }
 
-.footer-menu .bet-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 15px;
-}
+  /* Title styling */
+  .centered-menu h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 
-.footer-menu .side-bets-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  /* Bet containers styling */
+  .centered-menu .bet-container,
+  .centered-menu .side-bet {
+    margin-bottom: 15px;
+  }
 
-.footer-menu label {
-  font-size: 14px;
-  margin-bottom: 5px;
-}
+  .centered-menu label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
 
-.footer-menu input {
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 120px;
-}
+  .centered-menu input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-.footer-menu button {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007BFF;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
+  /* Button styling */
+  .centered-menu button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+  }
 
-.footer-menu button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
+  .centered-menu button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
 </style>
