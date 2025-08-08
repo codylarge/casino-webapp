@@ -18,7 +18,7 @@ const cards = [
 ];
 
 const covers = [
-    "cover_blue", "cover_red", //"cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
+    "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
 
 const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
@@ -29,8 +29,7 @@ const hitButton = document.getElementById('hit')
 const standButton = document.getElementById('stand')
 
 const mainBet = document.getElementById("main-bet")
-const pairBet = document.getElementById("pair-bet")
-const suitedPairBet = document.getElementById("suited-pair-bet")
+
 
 let playerCards = []
 let dealerCards = []
@@ -49,6 +48,7 @@ let cover // The back of the card design that will be used for the game
 
 let firstDeal = true;
 
+
 // CURRENT START GAME
 document.addEventListener('DOMContentLoaded', () => {
     playButton.addEventListener('click', startGame)
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function startGame() {
 
-    let totalBet = parseInt(mainBet.value, 10) + parseInt(pairBet.value, 10) + parseInt(suitedPairBet.value, 10)
+    let totalBet = parseInt(mainBet.value, 10)
 
     if (!checkMoney(totalBet)) {
         return
@@ -76,7 +76,7 @@ async function startGame() {
     console.log("Dealer Cards: " + dealerStartingCards)
 
 
-    console.log(`Main Bet: ${mainBet.value}, Pair Bet: ${pairBet}, Suited Pair Bet: ${suitedPairBet}`)
+    console.log(`Main Bet: ${mainBet.value}`)
     await dealStartingCards(dealerStartingCards, playerStartingCards, cover)
 }
 
@@ -95,20 +95,24 @@ async function stand() {
     console.log("Player stands")
 
     await playDealerHand();
-
+    let result;
     let playerTotal = getHandTotal(playerCards, 1)
     let dealerTotal = getHandTotal(dealerCards, 0)
 
     if (dealerTotal > 21) {
         console.log("Dealer busts")
+        result = 0; // Player winsw
     } else if (dealerTotal > playerTotal) {
         console.log("Dealer wins")
+        result = 1; // Dealer wins
     } else if (dealerTotal < playerTotal) {
         console.log("Player wins")
+        result = 0; // Player wins
     } else {
         console.log("Push")
+        result = 2; // Push
     }
-    await endGame()
+    await endGame(result, parseInt(mainBet.value, 10));
     setGameState(0)
 }
 
@@ -278,12 +282,43 @@ function setGameState(state) {
     }
 }
 
-// 0 = dealer win, 1 = player 1 win
-async function endGame(results) {
-    if(results === 0) {
-        
+// 0 = dealer win, 1 = player 1 win, 2 = push
+async function endGame(results, win = 0) {
+  return new Promise((resolve) => {
+    const endGameScreen = document.getElementById("end-screen");
+    const continueBtn = document.getElementById("continue-btn");
+    const betWin = document.getElementById("bet-results");
+    // Determine the message based on the result
+    switch (results) {
+      case 0: // LOSE
+        betWin.textContent = `$${win}`;
+        endGameScreen.style.display = "block";
+        break;
+      case 1: // WIN
+        betWin.textContent = `$${win}`;
+        endGameScreen.style.display = "block";
+        break;
+      case 2: // PUSH
+        endGameScreen.style.display = "block";
+        break;
+      default:
+        endGameScreen.style.display = "block";
+        break;
     }
+
+    // Show the continue button
+    continueBtn.style.display = "block";
+
+    // Wait for user to click continue
+    continueBtn.onclick = () => {
+      continueBtn.style.display = "none";
+      messageBox.textContent = "";
+      resolve(); // Resume after user continues
+    };
+  });
 }
+
+
 
 function reset(){
     removeAllCards()

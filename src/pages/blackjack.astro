@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import BlackjackMenu from "../components/BlackjackMenu.astro";
+import BlackjackEndScreen from "../components/BlackjackEndScreen.astro";
 interface Props {
   title: string;
 }
@@ -21,6 +22,9 @@ const { title } = Astro.props;
       <div class="button-container">
         <button id="hit" style="display: none">HIT</button>
         <button id="stand" style="display: none">STAY</button>
+      </div>
+      <div id="end-game-screen" style="display: none">
+        <BlackjackEndScreen  />
       </div>
       <div class="player-hand">
         <h3 id="player-total" class="hand-title">Your Hand:</h3>
