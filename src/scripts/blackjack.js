@@ -1,4 +1,12 @@
-
+// TODO:
+// BUGS:
+/*
+1. Player can spam hit/stay and break the game'
+2. Player gets 2 aces to start will show 22 instead of 12
+3. If player busts and dealer busts, player win
+3. If player gets blackjack and dealer gets 21 the game goes to dealer win instead of push -ai
+4. If player gets blackjack and dealer gets 21 the game goes to dealer win instead of push -ai
+*/
 //hand = 0: Dealer
 //hand = 1: Player 1
 const cards = [
@@ -99,20 +107,24 @@ async function stand() {
     let playerTotal = getHandTotal(playerCards, 1)
     let dealerTotal = getHandTotal(dealerCards, 0)
 
-    if (dealerTotal > 21) {
+    if (playerTotal > 21) {
+        console.log("Player busts")
+        result = 0; // Dealer wins
+    } else if (dealerTotal > 21) {
         console.log("Dealer busts")
-        result = 0; // Player winsw
+        result = 1; // Player wins
     } else if (dealerTotal > playerTotal) {
         console.log("Dealer wins")
-        result = 1; // Dealer wins
+        result = 0; // Dealer wins
     } else if (dealerTotal < playerTotal) {
         console.log("Player wins")
-        result = 0; // Player wins
+        result = 1; // Player wins
     } else {
         console.log("Push")
         result = 2; // Push
     }
     await endGame(result, parseInt(mainBet.value, 10));
+    console.log("End game complete, resetting")
     setGameState(0)
 }
 
@@ -222,7 +234,7 @@ function getHandTotal(cards, player) {
 }
 
 // This method is called to check a bust in any situation (before or after 21 is exceeded)
-// player: 0 = dealer, 1 = player 1
+// 0 = dealer, 1 = player
 function confirmBust(player) {
     let total = getHandTotal(player === 0 ? dealerCards : playerCards)
     let aces = player === 0 ? dealerAces : playerAces
@@ -287,32 +299,40 @@ async function endGame(results, win = 0) {
   return new Promise((resolve) => {
     const endGameScreen = document.getElementById("end-screen");
     const continueBtn = document.getElementById("continue-btn");
-    const betWin = document.getElementById("bet-results");
+    const resultMessage = document.getElementById("result-message");
+    const mainBet = document.getElementById("main-bet-result");
     // Determine the message based on the result
     switch (results) {
       case 0: // LOSE
-        betWin.textContent = `$${win}`;
+        resultMessage.textContent = `You LOSE!`;
+        mainBet.style.color = "red";
+        mainBet.textContent = `-$${win}`;
         endGameScreen.style.display = "block";
         break;
       case 1: // WIN
-        betWin.textContent = `$${win}`;
+        updateMoney(win * 2) // Pay the player double their bet
+        resultMessage.textContent = `You WIN!`;
+        mainBet.style.color = "green";
+        mainBet.textContent = `+$${win*2}`;
         endGameScreen.style.display = "block";
         break;
       case 2: // PUSH
+        updateMoney(win) // Return the player's bet
+        resultMessage.textContent = `Push!`;
+        mainBet.style.color = "white";
+        mainBet.textContent = `+$${win}`;
         endGameScreen.style.display = "block";
         break;
       default:
         endGameScreen.style.display = "block";
         break;
     }
-
-    // Show the continue button
+    
     continueBtn.style.display = "block";
 
     // Wait for user to click continue
     continueBtn.onclick = () => {
-      continueBtn.style.display = "none";
-      messageBox.textContent = "";
+      endGameScreen.style.display = "none";
       resolve(); // Resume after user continues
     };
   });
@@ -328,7 +348,8 @@ function reset(){
     playerModifier = 0
 }
 
-// Duplicate code from poker.js
+// Duplicate code from poker.js - Checks if the user has enough money for a bet, if they do it deducts the money
+// Returns true if the user has enough money, Alerts user and returns false otherwise
 function checkMoney(bet) {
     if (isNaN(bet)) {
         alert("Please enter a valid number as a bet")

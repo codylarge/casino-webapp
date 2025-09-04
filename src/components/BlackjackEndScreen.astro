@@ -1,16 +1,15 @@
-<div class="end-screen">
+<div id="end-screen">
     <h1>Game Over</h1>
     <div class="results">
-      <span class="winnings-item" id="win-span">You Win:</span>
-      <span class="winnings-item" id="lose-span">You Lose:</span>
-      <span class="winnings-item" id="draw-span">Draw:</span>
+      <h2 id="result-message"></h2>
+      <h3 id="main-bet-result"></h3>
     </div>
     <button id="continue-btn">Continue</button>
   </div>
   
   <style>
     /* End screen container */
-    .end-screen {
+    #end-screen {
       position: fixed;
       top: 50%;
       left: 50%;
@@ -22,10 +21,11 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
       text-align: center;
       width: 400px;
+      display: none;
     }
   
     /* Title styling */
-    .end-screen h1 {
+    #end-screen h1 {
       font-size: 32px;
       margin-bottom: 20px;
     }
@@ -59,6 +59,22 @@
       font-weight: bold;
       font-size: 20px;
     }
+
+    #continue-btn {
+      display: block;
+      margin: 0 auto;   /* centers it horizontally */
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border: 2px solid #007BFF;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      width: fit-content;  /* so it only wraps text instead of full width */
+    }
+
   
     /* Responsive design */
     @media (max-width: 500px) {
