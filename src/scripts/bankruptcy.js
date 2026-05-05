@@ -9,5 +9,4 @@ bankruptcyButton.addEventListener('click', function() {
         sessionStorage.setItem("money", "1000");
         moneyDisplay.textContent = `$${sessionStorage.getItem("money")}`;
     } 
-
 });
