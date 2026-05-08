@@ -1,14 +1,22 @@
 <div class="centered-menu">
   <h1>Big Money Blackjack</h1>
   <div class="bet-container">
-    <label for="main-bet">Main Bet:</label>
-    <input type="number" id="main-bet" min="1" placeholder="Place Bet">
+    <label>Main Bet:</label>
+    <div class="bet-display" id="bet-display">$0</div>
+  <input type="hidden" id="main-bet" value="0" />
   </div>
+  <div class="chips-row">
+    <img src="/chips/chip_10.webp"   alt="$10"   class="chip" data-value="10"   title="$10" />
+    <img src="/chips/chip_100.webp"  alt="$100"  class="chip" data-value="100"  title="$100" />
+    <img src="/chips/chip_500.webp"  alt="$500"  class="chip" data-value="500"  title="$500" />
+    <img src="/chips/chip_1000.webp" alt="$1000" class="chip" data-value="1000" title="$1000" />
+    <img src="/chips/chip_5000.webp" alt="$5000" class="chip" data-value="5000" title="$5000" />
+  </div>
+  <button id="clear-bet-button">Clear Bet</button>
   <button id="play-button">Play</button>
 </div>
 
 <style>
-  /* Center the menu on the screen */
   .centered-menu {
     position: fixed;
     top: 50%;
@@ -19,19 +27,16 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    width: 300px;
+    width: 360px;
     text-align: center;
   }
 
-  /* Title styling */
   .centered-menu h1 {
     font-size: 24px;
     margin-bottom: 20px;
   }
 
-  /* Bet containers styling */
-  .centered-menu .bet-container,
-  .centered-menu .side-bet {
+  .bet-container {
     margin-bottom: 15px;
   }
 
@@ -41,30 +46,131 @@
     margin-bottom: 5px;
   }
 
-  .centered-menu input {
+  .bet-display {
+    font-size: 28px;
+    font-weight: bold;
+    color: #f0c040;
+    background: #222;
+    border: 2px solid #555;
+    border-radius: 8px;
     padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
+    min-height: 48px;
+    line-height: 1;
   }
 
-  /* Button styling */
+  .chips-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    width: 56px;
+    height: 56px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.15s, filter 0.15s;
+    user-select: none;
+  }
+
+  .chip:hover {
+    transform: scale(1.15) translateY(-4px);
+  }
+
+  .chip.disabled {
+    filter: grayscale(80%) opacity(0.45);
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .centered-menu button {
     padding: 10px 20px;
     font-size: 18px;
     border: none;
     border-radius: 5px;
-    background-color: #007BFF;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     width: 100%;
+    margin-bottom: 8px;
   }
 
-  .centered-menu button:hover {
+  #clear-bet-button {
+    background-color: #888;
+    font-size: 14px;
+    padding: 7px;
+    margin-bottom: 10px;
+  }
+
+  #clear-bet-button:hover {
+    background-color: #666;
+  }
+
+  #play-button {
+    background-color: #007BFF;
+  }
+
+  #play-button:hover {
     background-color: #0056b3;
     transform: scale(1.05);
   }
+
+  #play-button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+    transform: none;
+  }
 </style>
+
+<script>
+  let currentBet = 0;
+
+  const betDisplay  = document.getElementById('bet-display');
+  const mainBetInput = document.getElementById('main-bet') as HTMLInputElement;
+  const playButton  = document.getElementById('play-button') as HTMLButtonElement;
+  const clearButton = document.getElementById('clear-bet-button');
+  const chips       = document.querySelectorAll<HTMLImageElement>('.chip');
+
+  function getMoney(): number {
+    return parseFloat(sessionStorage.getItem('money') ?? '0') || 0;
+  }
+
+  function updateUI() {
+    betDisplay!.textContent = `$${currentBet.toLocaleString()}`;
+    mainBetInput.value = String(currentBet);
+
+    const money = getMoney();
+    chips.forEach(chip => {
+      const value = parseInt(chip.dataset.value ?? '0', 10);
+      const canAfford = currentBet + value <= money;
+      chip.classList.toggle('disabled', !canAfford);
+    });
+
+    playButton.disabled = currentBet <= 0;
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.classList.contains('disabled')) return;
+      const value = parseInt(chip.dataset.value ?? '0', 10);
+      const money = getMoney();
+      if (currentBet + value > money) return;
+      currentBet += value;
+      updateUI();
+    });
+  });
+
+  clearButton?.addEventListener('click', () => {
+    currentBet = 0;
+    updateUI();
+  });
+
+  playButton?.addEventListener('click', () => {
+    if (currentBet <= 0) return;
+    sessionStorage.setItem('currentBet', String(currentBet));
+  });
+
+  updateUI();
+</script>

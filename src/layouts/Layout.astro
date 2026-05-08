@@ -23,7 +23,11 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <script src="../scripts/sessionStorage.js"></script>
+    <script is:inline>
+      if (!sessionStorage.getItem("money") || isNaN(sessionStorage.getItem("money"))) {
+        sessionStorage.setItem("money", "1000");
+      }
+    </script>
 
     <!-- <title>{title}</title> -->
   </head>

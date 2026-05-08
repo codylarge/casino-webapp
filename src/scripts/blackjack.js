@@ -5,7 +5,6 @@
 2. Player gets 2 aces to start will show 22 instead of 12
 3. If player busts and dealer busts, player win
 3. If player gets blackjack and dealer gets 21 the game goes to dealer win instead of push -ai
-4. If player gets blackjack and dealer gets 21 the game goes to dealer win instead of push -ai
 */
 //hand = 0: Dealer
 //hand = 1: Player 1
@@ -42,13 +41,6 @@ const mainBet = document.getElementById("main-bet")
 let playerCards = []
 let dealerCards = []
 
-// UNUSD ACES (When ace is converted from 11 -> 1 it is no longer counted here)
-let dealerAces = 0 
-let playerAces = 0
-
-// Modifiers used to artificially change the dealer and player's hand values (for aces)
-let dealerModifier = 0
-let playerModifier = 0
 
 let deck = []
 
@@ -88,14 +80,12 @@ async function startGame() {
     await dealStartingCards(dealerStartingCards, playerStartingCards, cover)
 }
 
-function hit() {
+async function hit() {
     dealCard(1, deck.pop());
-    let playerTotal = getHandTotal(playerCards, 1)
-    if (playerTotal > 21) {
-        if(confirmBust(1)) {
-            console.log("Player busts")
-            stand()
-        }
+    if (getHandTotal(playerCards) > 21) {
+        console.log("Player busts")
+        await endGame(0, parseInt(mainBet.value, 10))
+        setGameState(0)
     }
 }
 
@@ -104,8 +94,8 @@ async function stand() {
 
     await playDealerHand();
     let result;
-    let playerTotal = getHandTotal(playerCards, 1)
-    let dealerTotal = getHandTotal(dealerCards, 0)
+    let playerTotal = getHandTotal(playerCards)
+    let dealerTotal = getHandTotal(dealerCards)
 
     if (playerTotal > 21) {
         console.log("Player busts")
@@ -136,15 +126,12 @@ async function playDealerHand() {
     dealerHandDocument.insertBefore(cardImage, dealerHandDocument.firstChild);
     dealerCards.push(faceDownCard)
     // Calculate dealer's total
-    let dealerTotal = getHandTotal(dealerCards, 0);
+    let dealerTotal = getHandTotal(dealerCards);
     updateHandTotal(0)
-    // While the dealer's total is less than 17
     while (dealerTotal < 17) {
-        await sleep(1000); // 1 second pause
-
+        await sleep(1000);
         dealCard(0, deck.pop());
-        dealerTotal = getHandTotal(dealerCards, 0);
-        confirmBust(0)
+        dealerTotal = getHandTotal(dealerCards);
     }
 }
 
@@ -183,12 +170,10 @@ function dealCard(hand, cardTitle) {
         handDocument = dealerHandDocument
         console.log("Dealing to dealer");
         dealerCards.push(cardTitle)
-        if(cardTitle.includes("ace")) dealerAces++
     } else {
         handDocument = playerHandDocument
         console.log("Dealing to player 1");
         playerCards.push(cardTitle)
-        if(cardTitle.includes("ace")) playerAces++
     }
     // TODO: MAKE SURE IF ITS A COVER DONT ADD IT
     handDocument.appendChild(cardImage);
@@ -211,49 +196,29 @@ function shuffleArray(array) {
     return array
 }
 
-// retrns the total value of a hand assuming aces are 11
-function getHandTotal(cards, player) {
-    let cardValues = []
+function getHandTotal(cards) {
+    let total = 0;
+    let aces = 0;
 
     for (let card of cards) {
         let cardValue = card.split('_')[0]
-        if (cardValue === "jack" || cardValue === "queen" || cardValue === "king") cardValue = 10
-        else if (cardValue === "ace") cardValue = 11
-        else if(cardValue === "cover") cardValue = 0
-        else cardValue = parseInt(cardValue, 10)
-        cardValues.push(cardValue)
+        if (cardValue === "jack" || cardValue === "queen" || cardValue === "king") total += 10;
+        else if (cardValue === "ace") { total += 11; aces++; }
+        else if (cardValue === "cover") total += 0;
+        else total += parseInt(cardValue, 10);
     }
 
-    cardValues.sort((a, b) => a - b); // sort the array in ascending order
-    let sum = cardValues.reduce((a, b) => a + b, 0) // sum all the values in the array
+    while (total > 21 && aces > 0) {
+        total -= 10;
+        aces--;
+    }
 
-    if(player === 0) sum += dealerModifier
-    else if(player === 1) sum += playerModifier
-    
-    return sum
+    return total;
 }
 
-// This method is called to check a bust in any situation (before or after 21 is exceeded)
 // 0 = dealer, 1 = player
 function confirmBust(player) {
-    let total = getHandTotal(player === 0 ? dealerCards : playerCards)
-    let aces = player === 0 ? dealerAces : playerAces
-
-    if (total <= 21) return false // Not a bust
-    if(aces === 0) return true // No aces so confirmed bust
-    
-    if(aces > 0 && total > 21) {
-        if(player === 0) {
-            dealerModifier -= 10
-            dealerAces -= 1
-            updateHandTotal(0)
-        } else if (player === 1) {
-            playerModifier -= 10
-            playerAces -= 1
-            updateHandTotal(1)
-        }
-        return false
-    }
+    return getHandTotal(player === 0 ? dealerCards : playerCards) > 21;
 }
 
 // Updates the total of a hand to be shown on the screen
@@ -263,11 +228,11 @@ function updateHandTotal(player) {
     if(player === 0) {
         totalDocument = document.getElementById("dealer-total")
         totalDocument.textContent = "Dealer Total:"
-        currentTotal = getHandTotal(dealerCards, 0)
+        currentTotal = getHandTotal(dealerCards)
     } else if (player === 1) {
         totalDocument = document.getElementById("player-total")
         totalDocument.textContent = "Player Total:"
-        currentTotal = getHandTotal(playerCards, 1)    
+        currentTotal = getHandTotal(playerCards)
     }
     totalDocument.textContent += ` ${currentTotal}`;
 }
@@ -286,6 +251,8 @@ function setGameState(state) {
         gameContainer.style.display = "none";
         hitButton.style.display = "none";
         standButton.style.display = "none";
+        // RESET BET TO 0
+        document.getElementById("clear-bet-button").click();
     } else if (state === 1) {
         bettingMenu.style.display = "none";
         gameContainer.style.display = "block";
@@ -342,10 +309,6 @@ async function endGame(results, win = 0) {
 
 function reset(){
     removeAllCards()
-    dealerAces = 0
-    playerAces = 0
-    dealerModifier = 0
-    playerModifier = 0
 }
 
 // Duplicate code from poker.js - Checks if the user has enough money for a bet, if they do it deducts the money
