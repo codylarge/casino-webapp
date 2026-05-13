@@ -22,6 +22,8 @@ const { title } = Astro.props;
       <div class="button-container">
         <button id="hit" style="display: none">HIT</button>
         <button id="stand" style="display: none">STAY</button>
+        <button id="double-down" style="display: none">DOUBLE</button>
+        <button id="hint-button" style="display: none">?</button>
       </div>
       <BlackjackEndScreen  />
       <div class="player-hand">
@@ -100,6 +102,35 @@ const { title } = Astro.props;
   button:active {
     background-color: #003f7f;
     transform: scale(0.95);
+  }
+
+  #hint-button {
+    background-color: #c9960c;
+    border-color: #c9960c;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    font-size: 20px;
+  }
+
+  #hint-button:hover {
+    background-color: #a67c00;
+    border-color: #a67c00;
+  }
+
+  #hint-button:active {
+    background-color: #7a5c00;
+  }
+
+  :global(.hint-highlight) {
+    border-color: #FFD700 !important;
+    box-shadow: 0 0 14px #FFD700;
+    animation: hintPulse 0.7s ease-in-out 2;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
   }
   </style>
   <script src="../scripts/preload.js"></script>

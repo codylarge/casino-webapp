@@ -1,11 +1,5 @@
-// TODO:
-// BUGS:
-/*
-1. Player can spam hit/stay and break the game'
-2. Player gets 2 aces to start will show 22 instead of 12
-3. If player busts and dealer busts, player win
-3. If player gets blackjack and dealer gets 21 the game goes to dealer win instead of push -ai
-*/
+import { getStrategy } from './blackjack_strategy.js'
+
 //hand = 0: Dealer
 //hand = 1: Player 1
 const cards = [
@@ -25,7 +19,7 @@ const cards = [
 ];
 
 const covers = [
-    "cover_blue", "cover_red", "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
+    "cover_blue", "cover_red"//, "cover_alt1", "cover_alt2", "cover_alt3", "cover_alt4"
 ]
 
 const dealerHandDocument = document.querySelector(".dealer-hand .cards-container");
@@ -34,6 +28,8 @@ const playerHandDocument = document.querySelector(".player-hand .cards-container
 const playButton = document.getElementById('play-button')
 const hitButton = document.getElementById('hit')
 const standButton = document.getElementById('stand')
+const doubleDownButton = document.getElementById('double-down')
+const hintButton = document.getElementById('hint-button')
 
 const mainBet = document.getElementById("main-bet")
 
@@ -47,6 +43,7 @@ let deck = []
 let cover // The back of the card design that will be used for the game
 
 let firstDeal = true;
+let currentBet = 0;
 
 
 // CURRENT START GAME
@@ -54,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     playButton.addEventListener('click', startGame)
     hitButton.addEventListener('click', hit)
     standButton.addEventListener('click', stand)
+    doubleDownButton.addEventListener('click', doubleDown)
+    hintButton.addEventListener('click', showHint)
     cover = pickRandomCover();
 });
 
@@ -62,10 +61,10 @@ async function startGame() {
 
     let totalBet = parseInt(mainBet.value, 10)
 
-    if (!checkMoney(totalBet)) {
-        return
-    }
-    // REMOVE THE COVERS 
+    if (!checkMoney(totalBet)) return
+    
+    currentBet = totalBet
+    // REMOVE THE COVERS
     reset()
     setGameState(1)
     console.log("Starting game")
@@ -78,18 +77,53 @@ async function startGame() {
 
     console.log(`Main Bet: ${mainBet.value}`)
     await dealStartingCards(dealerStartingCards, playerStartingCards, cover)
+
+    const playerTotal = getHandTotal(playerCards)
+    const dealerTotal = getHandTotal([dealerCards[1], deck[deck.length - 1]])
+    const playerBJ = playerTotal === 21
+    const dealerBJ = dealerTotal === 21
+
+    if (playerBJ || dealerBJ) {
+        revealDealerCard()
+        if (playerBJ && dealerBJ) {
+            await endGame(2, currentBet)
+        } else if (dealerBJ) {
+            await endGame(0, currentBet)
+        } else {
+            await endGame(1, currentBet)
+        }
+        setGameState(0)
+        return
+    }
+
+    hitButton.style.display = 'block'
+    standButton.style.display = 'block'
+    doubleDownButton.style.display = 'block'
+    hintButton.style.display = 'block'
 }
 
 async function hit() {
+    hitButton.style.display = 'none'
+    standButton.style.display = 'none'
+    doubleDownButton.style.display = 'none'
+    hintButton.style.display = 'none'
     dealCard(1, deck.pop());
     if (getHandTotal(playerCards) > 21) {
         console.log("Player busts")
-        await endGame(0, parseInt(mainBet.value, 10))
+        await endGame(0, currentBet)
         setGameState(0)
+    } else {
+        hitButton.style.display = 'block'
+        standButton.style.display = 'block'
+        hintButton.style.display = 'block'
     }
 }
 
 async function stand() {
+    hitButton.style.display = 'none'
+    standButton.style.display = 'none'
+    doubleDownButton.style.display = 'none'
+    hintButton.style.display = 'none'
     console.log("Player stands")
 
     await playDealerHand();
@@ -113,21 +147,50 @@ async function stand() {
         console.log("Push")
         result = 2; // Push
     }
-    await endGame(result, parseInt(mainBet.value, 10));
+    await endGame(result, currentBet);
     console.log("End game complete, resetting")
     setGameState(0)
 }
 
-async function playDealerHand() {
-    // Reveal dealer's face-down card
+async function doubleDown() {
+    if (!checkMoney(currentBet)) return
+    currentBet *= 2
+    hitButton.style.display = 'none'
+    standButton.style.display = 'none'
+    doubleDownButton.style.display = 'none'
+    hintButton.style.display = 'none'
+    dealCard(1, deck.pop())
+    if (getHandTotal(playerCards) > 21) {
+        console.log("Player busts on double down")
+        await endGame(0, currentBet)
+        setGameState(0)
+    } else {
+        await stand()
+    }
+}
+
+function showHint() {
+    const action = getStrategy(playerCards, dealerCards[1])
+    const buttonMap = { hit: hitButton, stand: standButton, double: doubleDownButton }
+    let target = buttonMap[action]
+    if (action === 'double' && doubleDownButton.style.display === 'none') target = hitButton
+
+    target.classList.add('hint-highlight')
+    setTimeout(() => target.classList.remove('hint-highlight'), 2500)
+}
+
+function revealDealerCard() {
     let faceDownCard = deck.pop()
     let cardImage = window.cardImages[faceDownCard].cloneNode();
     dealerHandDocument.removeChild(dealerHandDocument.firstChild);
     dealerHandDocument.insertBefore(cardImage, dealerHandDocument.firstChild);
     dealerCards.push(faceDownCard)
-    // Calculate dealer's total
-    let dealerTotal = getHandTotal(dealerCards);
     updateHandTotal(0)
+}
+
+async function playDealerHand() {
+    revealDealerCard()
+    let dealerTotal = getHandTotal(dealerCards);
     while (dealerTotal < 17) {
         await sleep(1000);
         dealCard(0, deck.pop());
@@ -216,25 +279,24 @@ function getHandTotal(cards) {
     return total;
 }
 
-// 0 = dealer, 1 = player
-function confirmBust(player) {
-    return getHandTotal(player === 0 ? dealerCards : playerCards) > 21;
-}
-
 // Updates the total of a hand to be shown on the screen
 // Player: 0 = dealer, 1 = player 1...
 function updateHandTotal(player) {
-    let totalDocument, currentTotal
+    let totalDocument, label, currentTotal
     if(player === 0) {
         totalDocument = document.getElementById("dealer-total")
-        totalDocument.textContent = "Dealer Total:"
+        label = "Dealer Total:"
         currentTotal = getHandTotal(dealerCards)
     } else if (player === 1) {
         totalDocument = document.getElementById("player-total")
-        totalDocument.textContent = "Player Total:"
+        label = "Player Total:"
         currentTotal = getHandTotal(playerCards)
     }
-    totalDocument.textContent += ` ${currentTotal}`;
+    if (currentTotal > 21) {
+        totalDocument.innerHTML = `${label} <span style="color: red;">BUST!</span>`;
+    } else {
+        totalDocument.textContent = `${label} ${currentTotal}`;
+    }
 }
 
 function sleep(ms) {
@@ -251,13 +313,13 @@ function setGameState(state) {
         gameContainer.style.display = "none";
         hitButton.style.display = "none";
         standButton.style.display = "none";
+        doubleDownButton.style.display = "none";
+        hintButton.style.display = "none";
         // RESET BET TO 0
         document.getElementById("clear-bet-button").click();
     } else if (state === 1) {
         bettingMenu.style.display = "none";
         gameContainer.style.display = "block";
-        hitButton.style.display = "block";
-        standButton.style.display = "block";
     }
 }
 
